@@ -13,10 +13,18 @@ class CreateDetalleNotaIngresoAsTable extends Migration
      */
     public function up()
     {
-        Schema::create('detalle_nota_ingreso_as', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
-        });
+      Schema::create('detalle_nota_ingreso_a', function(Blueprint $table) {
+          $table->increments('dNotIngA_id')->unsigned();
+          $table->int('nIngA_id',10)->unsigned();
+          $table->int('tienda_id',10)->unsigned();
+          $table->string('cod_barras',20);
+          $table->float('peso_cant',8,2);
+          $table->int('rollo',10);
+          $table->boolean('impreso');
+          $table->boolean('estado');
+          $table->timestamps('fecha');
+
+      });
     }
 
     /**
@@ -26,6 +34,6 @@ class CreateDetalleNotaIngresoAsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('detalle_nota_ingreso_as');
+      Schema::drop('detalle_nota_ingreso_a');
     }
 }

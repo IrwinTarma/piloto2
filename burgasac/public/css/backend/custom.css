@@ -1,1 +1,7 @@
 table tr td a{    margin: 5px 0px; vertical-align: middle !important;}
+table.table th {
+    background-color: #3c8dbc;
+    color: white;
+    text-align: center;
+    font-weight: 100;
+}

@@ -19,86 +19,125 @@
                 <div class="panel-heading">RECEPCIÓN DE TELA TEÑIDA</div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-2">
-                            <label for="">Fecha</label>
-                            <input id="fecha_table" type="text" class="form-control" name="fecha" >
-                        </div>
-                        <div class="col-md-2">
-                            <label for="">Control Interno</label>
-                            <input id="control_table" type="text" class="form-control" name="control" >
-                        </div>
-                        <div class="col-md-2">
-                            <label for="">Proveedor</label>
-                            <select id="proveedor_table" class="form-control" name="">
-                                <option value=""></option>
-                                @foreach ($proveedores as $key => $proveedor)
-                                    <option value="{{$proveedor->id}}">{{$proveedor->nombre_comercial}}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        
+                        <form action="{{ route('comercializacion.index') }}" method="GET">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="_method" value="GET">
 
-                        <div class="col-md-2">
-                            <label for="">Producto</label>
-                            <select class="form-control" name="producto" id="producto_table">
-                                <option value="">Todos</option>
-                                @foreach ($productos as $key => $producto)
-                                    <option value="{{$producto->id}}">{{$producto->nombre_generico}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="">Estado</label>
-                            <select class="form-control" name="estado" id="estado_table">
-                                <option value="1">Abierto</option>
-                                <option value="2">Cerrado</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label for=""> </label>
-                            <a href="#"  id="buscar-tabla" class="btn btn-primary">Buscar</a>
-                        </div>
+                            <div class="col-md-1">
+                                <label for="">Fecha</label>
+                                <input id="fecha" type="text" class="form-control" name="fecha" value="{{ $datosant->fecha }}">
+                            </div>
+                            <div class="col-md-1">
+                                <label for="">Control Interno</label>
+                                <input id="control" type="text" class="form-control" name="control" value="{{ $datosant->control }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="">Proveedor</label>
+                                <select id="proveedor" class="form-control" name="proveedor">
+                                    <option value="">Todos</option>
+                                    @foreach ($proveedores as $key => $proveedor)
+                                        <option value="{{$proveedor->id}}">{{$proveedor->nombre_comercial}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="">Producto</label>
+                                <select class="form-control" name="producto" id="producto">
+                                    <option value="">Todos</option>
+                                    @foreach ($productos as $key => $producto)
+                                        <option value="{{$producto->id}}">{{$producto->nombre_generico}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label for="">Estado</label>
+                                <select class="form-control" name="estado" id="estado">
+                                    <option value="1">Abierto</option>
+                                    <option value="2">Cerrado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1" style="text-align:right;">
+                                <br>
+                                <button type="submit" class=" signbuttons btn btn-primary">Buscar</button>                            
+                            </div>
+                            <div class="col-md-1" style="text-align:center;">
+                                <br>
+                                <a href="#"  id="buscar-tabla" class="btn btn-primary">Nuevo Ingreso</a>
+                            </div>
+
+                        </form>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <br>
                             <table id="bandeja-produccion" class="table table-striped table-bordered table-hover">
                                 <thead>
-                                <th>
-                                    Fecha
-                                </th>
-                                <th>
-                                    # Control Interno
-                                </th>
-                                <th>
-                                    Proveedor
-                                </th>
-                                <th>
-                                    Producto
-                                </th>
-                                <th>
-                                    Materia Prima
-                                </th>
-                                <th>
-                                    Lote
-                                </th>
-                                <th>
-                                    Peso
-                                </th>
-                                <th>
-                                    Rollos
-                                </th>
-                                <th>
-                                    Color
-                                </th>
-                                <th>
-                                    Estado
-                                </th>
-                                <th>
-                                    Nota de Ingreso
-                                </th>
-
+                                    <th>
+                                        Fecha
+                                    </th>
+                                    <th>
+                                        # Control Interno
+                                    </th>
+                                    <th>
+                                        Proveedor
+                                    </th>
+                                    <th>
+                                        Producto
+                                    </th>                                   
+                                    <th>
+                                        Peso
+                                    </th>
+                                    <th>
+                                        Rollos
+                                    </th>
+                                    <th>
+                                        Color
+                                    </th>
+                                    <th>
+                                        Estado
+                                    </th>
+                                    <th>
+                                        Nota de Ingreso
+                                    </th>
                                 </thead>
-                                <tbody>
+                                <tbody style="text-align: center;">
+                                @foreach($bandeja as $band)
+                                    <tr>
+                                        <td>
+                                            {{ $band->created_at }}
+                                        </td>
+                                        <td>
+                                            {{ $band->id }}
+                                        </td>
+                                        <td>
+                                            {{ $band->razon_social }}
+                                        </td>
+                                        <td>
+                                            {{ $band->nombre_generico }}
+                                        </td>
+                                        <td>
+                                            {{ $band->cantidad }}
+                                        </td>
+                                        <td>
+                                            {{ $band->rollos }}
+                                        </td>
+                                        <td>
+                                            {{ $band->nombre }}
+                                        </td>
+                                        <td>
+                                            {{ $band->estado }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Crear</a> | 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> | 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Editar</a> | 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Cerrar</a> | 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">X</a>
+                                        </td>                                    
+                                    </tr>
+                                @endforeach
                                 </tbody>
                             </table>
 
@@ -133,35 +172,15 @@
 
     </script>
     <script type="text/javascript">
-        $(function () {
-            // var today = new Date();
-            // var dd = today.getDate();
-            // var mm = today.getMonth()+1; //January is 0!
-            //
-            // var yyyy = today.getFullYear();
-            // if(dd<10){dd='0'+dd}
-            // if(mm<10){mm='0'+mm}
-            // today = yyyy+'-'+mm+'-'+dd;
-            //
-            // $("#fecha_table").attr('value',today);
-            // $("#proveedor_table").change(function () {
-            //   bandeja.ajax.reload()
-            // });
-            //
-            // $("#empleado_table").change(function () {
-            //   bandeja.ajax.reload()
-            // });
-            //
-            // $("#fecha_table").change(function () {
-            //   bandeja.ajax.reload();
-            // });
-
+        /*$(function () {
+            
             $("#buscar-tabla").click(function () {
                 bandeja.ajax.reload();
                 return false;
             })
 
-            bandeja = $("#bandeja-produccion").DataTable({
+            bandeja = $("#bandeja-produccion").DataTable(
+            {
                 processing: true,
                 serverSide: true,
                 "ajax":{
@@ -198,13 +217,7 @@
                             data.actions += '<a href="#" class="btn btn-danger btn-xs delete-detalle-planeamientos" data-id="' + planeamiento.id + '"   title="Editar Despacho"><span class="glyphicon glyphicon-pencil" aria-hidden="true"/></a>';
                             data.actions += '<a href="{{url('planeamientos/planeamientos')}}' + '/' + planeamiento.id  +'/liquidacion" class="btn btn-primary btn-xs" title="Cerrar Despacho"><span class="glyphicon glyphicon-trash" aria-hidden="true"/></a>';
 
-                            //   if(planeamiento.estado != 0)
-                            //    data.actions += '<a href="#" class="btn btn-danger btn-xs delete-detalle-planeamientos" data-id="' + planeamiento.id + '"   title="Editar Compra"><span class="glyphicon glyphicon-trash" aria-hidden="true"/></a>';
-                            // for (var j = 0,detalle; detalle = planeamiento.detalles[j]; j++) {
-                            //   //data.actions = '<a href="{{url('detalleplaneamientos/detalleplaneamientos')}}' + '/' + detalle.id  +'" class="btn btn-primary btn-xs" title="Editar Compra"><span class="glyphicon glyphicon-pencil" aria-hidden="true"/></a>';
-                            //
-                            //
-                            // }
+                           
 
                             return_data.push(jQuery.extend(true, {}, data));
                         }
@@ -240,12 +253,18 @@
 
                 },
             });
-        })
+        })*/
     </script>
 @stop
 @push('scripts')
     <script type="text/javascript">
-        $("#fecha_table").datepicker({ format: 'yyyy-mm-dd'})
+        $(document).ready(function()
+        {
+            $("#proveedor").val("{{ $datosant->proveedor }}");
+            $("#producto").val("{{ $datosant->producto }}");
+            $("#estado").val("{{ $datosant->estado }}");
+        });
+        $("#fecha").datepicker({ format: 'yyyy-mm-dd'})
             .on("show", function(e) {
                 return false;
             }).on("hide", function(e) {
@@ -254,4 +273,5 @@
             return false;
         });
     </script>
+
 @endpush

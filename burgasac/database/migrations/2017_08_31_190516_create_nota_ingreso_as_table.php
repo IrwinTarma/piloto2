@@ -13,10 +13,15 @@ class CreateNotaIngresoAsTable extends Migration
      */
     public function up()
     {
-        Schema::create('nota_ingreso_as', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
-        });
+      Schema::create('nota_ingreso_a', function(Blueprint $table) {
+          $table->increments('nIngA_id')->unsigned();
+          $table->int('proveedor_id',10)->unsigned();
+          $table->int('producto_id',10)->unsigned();
+          $table->int('color_id',10)->unsigned();
+          $table->string('partida',20);
+          $table->timestamps('fecha');
+
+      });
     }
 
     /**
@@ -26,6 +31,6 @@ class CreateNotaIngresoAsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('nota_ingreso_as');
+      Schema::drop('nota_ingreso_a');
     }
 }

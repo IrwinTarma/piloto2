@@ -15,6 +15,7 @@ use App\Titulo;
 use App\Empleado;
 use App\Maquina;
 use App\Producto;
+use App\Color;
 use Carbon\Carbon;
 use Session;
 use App\DetallePlaneamiento;
@@ -23,104 +24,95 @@ use DB;
 
 class ComercializacionController extends Controller
 {
-    public function index(Request $request)
+    public function index(request $request)
     {
         $proveedores = Proveedor::all();
         $empleados = Empleado::all();
-
-        if ($request->ajax()) {
-            $requestData = $request->all();
-            //$planeamientos = Planeamiento::with('empleado','maquina','detalles.accesorio','detalles.titulo','detalles.insumo','proveedor','producto');
-            $DetalleDespachoTintorerias = DetalleDespachoTintoreria::with('despachotintoreria','color','proveedor','producto');
-
-            //dd($planeamientos);
-            return Datatables::eloquent($DetalleDespachoTintorerias)
-                ->filter(function ($query) use ($request) {
-                    /*
-                                        if ($request->has('fecha')){
-                                           $query->where('despachotintoreria.fecha', '=', $uest->fecha);
-                                        }
-                                    if ($request->has('fecha')) {
-                                            $query->whereHas('despachotintoreria', function($query) use ($request){
-                                                $query->where('despachotintoreria.fecha', '=', $request->fecha);
-                                            });
-                                        }
-                    */
-                    if ($request->has('control')){
-                        $query->where('despacho_id', '=', $request->control);
-                    }
-                    if ($request->has('proveedor')) {
-                        $query->where('proveedor_id', '=', $request->proveedor);
-                    }
-
-                    if($request->has('producto')){
-                        $query->where("producto_id","=",$request->producto);
-                    }
-/*
-                    if($request->has('maquina')){
-                        $query->where("maquina_id","=",$request->maquina);
-                    }
-                    if ($request->has('empleado')) {
-                        $query->where('empleado_id', '=', $request->empleado);
-                    }
-
-                    if ($request->has('estado')){
-                        $query->where('estado', '=', $request->estado);
-                    }
-
-                    if ($request->has('turno')) {
-                        $query->where('turno', '=', $request->turno);
-                    }
-
-
-
-
-*/
-///////////////
-                    /*
-                    $q = $request->search["value"];
-                    if ($q) {
-                        $query->whereHas('empleado_id', function($query) use ($request,$q){
-                            $query->where('empleados.nombres', 'LIKE', $q);
-                        });
-
-                        $query->whereHas('proveedor', function($query) use ($request,$q){
-                            $query->where('proveedores.nombre_comercial', 'LIKE', $q);
-                        });
-
-                    }
-
-                    if ($request->has('fecha')){
-                        $query->where('fecha', '=', $request->fecha);
-                    }
-
-                    if($request->has('producto')){
-                        $query->where("producto_id","=",$request->producto);
-                    }
-
-                    if($request->has('maquina')){
-                        $query->where("maquina_id","=",$request->maquina);
-                    }
-
-                    if ($request->has('estado')){
-                        $query->where('estado', '=', $request->estado);
-                    }
-
-                    if ($request->has('turno')) {
-                        $query->where('turno', '=', $request->turno);
-                    }
-
-                    if ($request->has('proveedor')) {
-                        $query->where('proveedor_id', '=', $request->proveedor);
-                    }
-                    if ($request->has('empleado')) {
-                        $query->where('empleado_id', '=', $request->empleado);
-                    }*/
-                })
-                ->make(true);
-        }
         $productos = Producto::all();
-        return view('comercializacion.index',compact('proveedores','empleados','productos'));
+
+        $bandeja = DB::table('detalles_despacho_tintoreria')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
+            ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
+            ->select('detalles_despacho_tintoreria.created_at',
+                'detalles_despacho_tintoreria.id', 
+                'proveedores.razon_social', 
+                'productos.nombre_generico',
+                'detalles_despacho_tintoreria.cantidad',
+                'detalles_despacho_tintoreria.rollos',
+                'color.nombre',
+                'detalles_despacho_tintoreria.estado',
+                'detalles_despacho_tintoreria.color_id',
+                'detalles_despacho_tintoreria.producto_id',
+                'detalles_despacho_tintoreria.proveedor_id',
+                'detalles_despacho_tintoreria.nro_lote')
+            ->where('detalles_despacho_tintoreria.created_at', 'like', '%'.$request->fecha.'%')
+            ->where('detalles_despacho_tintoreria.id','like', '%'.$request->control.'%')
+            ->where('detalles_despacho_tintoreria.proveedor_id','like', '%'.$request->proveedor.'%')
+            ->where('detalles_despacho_tintoreria.producto_id','like', '%'.$request->producto.'%')
+            ->where('detalles_despacho_tintoreria.estado','like', '%'.$request->estado.'%')
+            ->get();
+
+        $datosant=$request;
+
+        return view('comercializacion.index',
+            compact('proveedores','empleados','productos','bandeja','datosant'));
 
     }
+
+    /*public function show($fecha)
+    {
+        $proveedores = Proveedor::all();
+        $empleados = Empleado::all();
+        $productos = Producto::all();
+
+        $bandeja = DB::table('detalles_despacho_tintoreria')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
+            ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
+            ->select('detalles_despacho_tintoreria.created_at',
+                'detalles_despacho_tintoreria.id', 
+                'proveedores.razon_social', 
+                'productos.nombre_generico',
+                'detalles_despacho_tintoreria.cantidad',
+                'detalles_despacho_tintoreria.rollos',
+                'color.nombre',
+                'detalles_despacho_tintoreria.estado',
+                'detalles_despacho_tintoreria.color_id',
+                'detalles_despacho_tintoreria.producto_id',
+                'detalles_despacho_tintoreria.proveedor_id',
+                'detalles_despacho_tintoreria.nro_lote')
+            ->where('detalles_despacho_tintoreria.created_at', 'like', '%'.$fecha.'%')
+            ->where('detalles_despacho_tintoreria.id','like', '%%')
+            ->where('proveedores.razon_social','like', '%%')
+            ->where('productos.nombre_generico','like', '%%')
+            ->where('detalles_despacho_tintoreria.estado','like', '%1%')
+            ->get();
+
+        return view('comercializacion.index',
+            compact('proveedores','empleados','productos','bandeja'));
+
+    }*/
 }
+
+
+/*if ($request->ajax()) {
+    $requestData = $request->all();
+    //$planeamientos = Planeamiento::with('empleado','maquina','detalles.accesorio','detalles.titulo','detalles.insumo','proveedor','producto');
+    $DetalleDespachoTintorerias = DetalleDespachoTintoreria::with('despachotintoreria','color','proveedor','producto');          
+    return Datatables::eloquent($DetalleDespachoTintorerias)
+        ->filter(function ($query) use ($request) {
+           
+            if ($request->has('control')){
+                $query->where('despacho_id', '=', $request->control);
+            }
+            if ($request->has('proveedor')) {
+                $query->where('proveedor_id', '=', $request->proveedor);
+            }
+
+            if($request->has('producto')){
+                $query->where("producto_id","=",$request->producto);
+            }
+        })
+        ->make(true);
+}*/

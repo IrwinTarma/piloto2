@@ -13,10 +13,10 @@ class CreateTiendasTable extends Migration
      */
     public function up()
     {
-        Schema::create('tiendas', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
-        });
+      Schema::create('tienda', function(Blueprint $table) {
+          $table->increments('tienda_id')->unsigned();         
+          $table->string('desc_tienda',50);
+      });
     }
 
     /**
@@ -26,6 +26,6 @@ class CreateTiendasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tiendas');
+      Schema::drop('tienda');
     }
 }

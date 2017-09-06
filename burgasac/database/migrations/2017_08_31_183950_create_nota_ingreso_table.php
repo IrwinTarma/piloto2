@@ -13,7 +13,13 @@ class CreateNotaIngresoTable extends Migration
      */
     public function up()
     {
-        //
+      Schema::create('nota_ingreso', function(Blueprint $table) {
+          $table->increments('nIng_id')->unsigned();
+          $table->int('despTint_id',10);
+          $table->string('partida',20);
+          $table->timestamps('fecha');
+          
+      });
     }
 
     /**
@@ -23,6 +29,6 @@ class CreateNotaIngresoTable extends Migration
      */
     public function down()
     {
-        //
+      Schema::drop('nota_ingreso');
     }
 }
