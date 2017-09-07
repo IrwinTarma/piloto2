@@ -26,75 +26,100 @@ class NotaIngresoController extends Controller
 */
     public function store(Request $request)
     {
-
-    	/*DB::transaction(function()
-		{
-		    DB::table('users')->update(array('votes' => 1));
-
-		    DB::table('posts')->delete();
-		});*/
-		//Eliminar todos los registros según control interno
-		/*$aux= DB::table('nota_ingreso')->where('despTint_id','=',1)->select('nIng_id')->get();
-		echo $aux; 		
-		foreach ($aux as $key => $value) {
-			# code...
-			$dni1 = DetalleNotaIngreso::whereIn('nIng_id',$key->nIng_id);
-		$dni1->delete();
-		}
-		
-
-		//$users = DB::table('users')->whereIn('id', array(1, 2, 3))->get();
-
-		$dni2 = NotaIngreso::where('despTint_id','=',$request->codint);
-		$dni2->delete();*/
-
-		//Recorrer, evaluar que la partida no halla sido registrada antes, e ingresar todos
-		
+    	
 		/*DB::transaction(function()
 		{*/
+			/************************ ELMINACION *******************************/
+			//eliminamos los que esten en codigos a eliminar
+				//verificamos si el codigo esta en la bd,par eliminarlo, sino esta el codigo fue alterado por el navegador, sólo se puede eliminar uno de los registro que se han traido(dentro del filtro pasamos el codigo qeu jala todo)
+			
+			$arrayElim=explode(",", $request->eliminados);
+
+			for($j=0;$j<count($arrayElim);$j++)
+			{
+				DetalleNotaIngreso::where('dNotIng_id','=',$arrayElim[$j])->delete();	
+			}
+			//que me vote las partidas segun codigo interno
+			//evaluar si no tiene detalles
+			//sino delete
+			
+			$partidas = NotaIngreso::select('partida','nIng_id')
+            ->where('despTint_id','=', $request->codint)                      
+            ->get();
+
+            foreach($partidas as $obj)
+            {
+				$verdetpar = DB::table('detalle_nota_ingreso')
+	            ->leftJoin('nota_ingreso', 'detalle_nota_ingreso.ning_id', '=', 'nota_ingreso.ning_id')
+	            ->select('desptint_id')
+	            ->where('nota_ingreso.desptint_id','=', $request->codint)
+	            ->where('nota_ingreso.partida','=',$obj->partida)            
+	            ->get()
+	            ->first();
+
+	            if($verdetpar=="")
+				{
+					$deletedRows = NotaIngreso::where('nIng_id','=',$obj->nIng_id)->delete();										
+				}
+			}
+			/************************ FIN ELMINACION *******************************/
+
+
 			for($i=1;$i<=$request->conta;$i++)
 			{
-
-				$nIng_id=NotaIngreso::select('nIng_id')
-				->where('despTint_id','=',$request->codint)
-				->where('partida','=',$request["par_".$i])
-				->where('fecha','=',$request["fec_".$i])
-				->orderBy('nIng_id','desc')->get()->first();
-
-				if($nIng_id=="")
+				if($request["cod_ndi_".$i]!="")
 				{
-					$NotaIngreso=new NotaIngreso;
-					$NotaIngreso->despTint_id=$request->codint;
-					$NotaIngreso->partida=$request["par_".$i];
-					$NotaIngreso->fecha=$request["fec_".$i];
+					if($request["cod_ndi_".$i]==0)//si es diferente no se ingresa
+					{
+						$nIng_id=NotaIngreso::select('nIng_id')
+						->where('despTint_id','=',$request->codint)
+						->where('partida','=',$request["par_".$i])
+						//->where('fecha','=',$request["fec_".$i])
+						->orderBy('nIng_id','desc')->get()->first();
 
-					$NotaIngreso->save();
+						if($nIng_id=="")
+						{
+							$NotaIngreso=new NotaIngreso;
+							$NotaIngreso->despTint_id=$request->codint;
+							$NotaIngreso->partida=$request["par_".$i];
+							//$NotaIngreso->fecha=$request["fec_".$i];
+
+							$NotaIngreso->save();
+						}
+					}
 				}
 			}
 			//Recorrer, buscar el reg de la partida y fecha y registrar
 			for($i=1;$i<=$request->conta;$i++)
 			{
-				$nIng_id=NotaIngreso::select('nIng_id')
-				->where('despTint_id','=',$request->codint)
-				->where('partida','=',$request["par_".$i])
-				->where('fecha','=',$request["fec_".$i])
-				->orderBy('nIng_id','desc')->get()->first();
+				if($request["cod_ndi_".$i]!="")
+				{
+					if($request["cod_ndi_".$i]==0)//si es diferente no se ingresa
+					{
+						$nIng_id=NotaIngreso::select('nIng_id')
+						->where('despTint_id','=',$request->codint)
+						->where('partida','=',$request["par_".$i])
+						//->where('fecha','=',$request["fec_".$i])
+						->orderBy('nIng_id','desc')->get()->first();
+						
+							$DetalleNotaIngreso=new DetalleNotaIngreso;
+							$DetalleNotaIngreso->nIng_id=$nIng_id->nIng_id;
+							$DetalleNotaIngreso->tienda_id=$request["tie_".$i];
+							$DetalleNotaIngreso->cod_barras="código de prueba";
+							$DetalleNotaIngreso->peso_cant=$request["pes_".$i];
+							$DetalleNotaIngreso->rollo=$request["roll_".$i];
+							$DetalleNotaIngreso->impreso="1";
+							$DetalleNotaIngreso->fecha=$request["fec_".$i];
 
-				$DetalleNotaIngreso=new DetalleNotaIngreso;
-				$DetalleNotaIngreso->nIng_id=$nIng_id->nIng_id;
-				$DetalleNotaIngreso->tienda_id=$request["tie_".$i];
-				$DetalleNotaIngreso->cod_barras="código de prueba";
-				$DetalleNotaIngreso->peso_cant=$request["pes_".$i];
-				$DetalleNotaIngreso->rollo=$request["roll_".$i];
-				$DetalleNotaIngreso->impreso="1";
-				$DetalleNotaIngreso->fecha=$request["fec_".$i];
-
-		        $DetalleNotaIngreso->save();
+					        $DetalleNotaIngreso->save();
+					    
+				    }
+				}
 			}
 
 		//});
 
-       return redirect()->route('comercializacion.index')->with('info','Las notas se crearon correctamente.');  
+       return redirect()->route('notaingreso.show',$request->codint)->with('info','Las notas se crearon correctamente.'); 
     }
 /*
     public function update(Request $request,$id)
@@ -171,8 +196,10 @@ class NotaIngresoController extends Controller
             	'nota_ingreso.partida',
             	'color.nombre',
             	'detalle_nota_ingreso.peso_cant',
-            	'detalle_nota_ingreso.rollo')
+            	'detalle_nota_ingreso.rollo',
+            	'detalle_nota_ingreso.impreso')
             ->where('nota_ingreso.desptint_id','=', $id)
+            ->orderBy('detalle_nota_ingreso.fecha',"Asc")
             ->get();
 
 

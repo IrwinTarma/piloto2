@@ -130,9 +130,8 @@
                                             {{ $band->estado }}
                                         </td>
                                         <td>
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Crear</a> | 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
                                             <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> | 
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Editar</a> | 
                                             <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Cerrar</a> | 
                                             <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">X</a>
                                         </td>                                    

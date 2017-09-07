@@ -26,6 +26,6 @@ class NotaIngreso extends Model
    *
    * @var array
    */
-  protected $fillable = ['despTint_id', 'partida', 'fecha'];
+  protected $fillable = ['despTint_id', 'partida'];
 
 }

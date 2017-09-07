@@ -17,7 +17,7 @@ class CreateNotaIngresoTable extends Migration
           $table->increments('nIng_id')->unsigned();
           $table->int('despTint_id',10);
           $table->string('partida',20);
-          $table->timestamps('fecha');
+          //$table->timestamps('fecha');
           
       });
     }

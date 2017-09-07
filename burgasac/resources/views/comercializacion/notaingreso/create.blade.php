@@ -24,6 +24,7 @@
                     <input type="hidden" name="_method" value="POST">
                     <input type="hidden" name="codint" id="codint" value="{{ $id }}">
                     <input type="hidden" name="conta" id="conta" value="">
+                    <input type="hidden" name="eliminados" id="eliminados" value="">
 
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -159,7 +160,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     
-                                        <button class="btn btn-link">Registrar</button>
+                                        <button class="btn btn-primary">Guardar</button>
                                     
                                 </div>
                             </div>
@@ -184,9 +185,6 @@ var indice_tabla=0;
         /**
          * Funcion para añadir una nueva columna en la tabla
          */
-
-         
-
         $("#add").click(function(){
             // Obtenemos el numero de filas (td) que tiene la primera columna
 
@@ -204,11 +202,11 @@ var indice_tabla=0;
             nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso").val()+'">'+$("#peso").val()+"</td>";
             nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollo").val()+'">'+$("#rollo").val()+"</td>";
 
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" checked>'+"</td>";
+            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="">'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick=$("#fila_'+indice_tabla+'").remove() >X</div>';
+            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
         });
@@ -228,12 +226,12 @@ var indice_tabla=0;
         });*/
 
         @foreach($bandejatabla as $tab_bandeja) 
-            addtabla("{{ $tab_bandeja->ning_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}");
+            addtabla("{{ $tab_bandeja->dNotIng_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}");
         @endforeach
 
         
     });
-        function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll)
+        function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll,imp)
         {
             indice_tabla++;
             $("#conta").val(indice_tabla);
@@ -248,14 +246,21 @@ var indice_tabla=0;
             nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'">'+pes+"</td>";
             nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'">'+roll+"</td>";
 
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" checked>'+"</td>";
+            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" '+((imp==1)?"checked":"")+'>'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick=$("#fila_'+indice_tabla+'").remove() >X</div>';
+            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
             return 1;            
+        }
+
+        function delTabla(id)
+        {            
+            datos= $("#eliminados").val()+","+$("#cod_ndi_"+id).val();
+            $("#eliminados").val(datos);
+            $("#fila_"+id).remove();
         }
     </script>
 @endpush('scripts')
