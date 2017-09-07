@@ -73,40 +73,36 @@
                                     <br>
                                     <table id="bandeja-produccion" class="table table-striped table-bordered table-hover">
                                         <thead>
-                                        <th>
-                                            Item
-                                        </th>
-                                        <th>
-                                            Fecha
-                                        </th>
-                                        <th>
-                                            Producto
-                                        </th>
-                                        <th>
-                                            Tienda
-                                        </th>
-                                        <th>
-                                            Partida
-                                        </th>
-                                        <th>
-                                            Color
-                                        </th>
-                                        <th>
-                                            Peso
-                                        </th>
-                                        <th>
-                                            Rollos
-                                        </th>
-                                        <th>
-                                            Print
-                                        </th>
-                                        <th>
-                                            Color
-                                        </th>
-                                        <th>
-                                            X
-                                        </th>
-                                        
+                                            <th>
+                                                Item
+                                            </th>
+                                            <th>
+                                                Fecha
+                                            </th>
+                                            <th>
+                                                Producto
+                                            </th>
+                                            <th>
+                                                Tienda
+                                            </th>
+                                            <th>
+                                                Partida
+                                            </th>
+                                            <th>
+                                                Color
+                                            </th>
+                                            <th>
+                                                Peso
+                                            </th>
+                                            <th>
+                                                Rollos
+                                            </th>
+                                            <th>
+                                                Print
+                                            </th>
+                                            <th>
+                                                X
+                                            </th>                                       
                                         </thead>
                                         <tbody>
                                         </tbody>

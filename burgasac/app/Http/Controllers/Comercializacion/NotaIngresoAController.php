@@ -12,12 +12,12 @@ class NotaIngresoAController extends Controller
     {
         $this->middleware('auth');
     }
-/*
     public function index()
     {
-    	$provedors=provedor::orderBy("nProvCod","ASC")->paginate();
-    	return view("provedor.index",compact("provedors"));
+        return view("comercializacion.notaingresoatipico.create");
+
     }
+/*
 
     public function store(Request $request)
     {

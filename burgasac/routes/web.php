@@ -126,4 +126,4 @@ Route::resource('comercializacion/comercializacion','Comercializacion\\Comercial
 /*********** BANDEJA DE RECEPCION DE TELA TEÑIDA *******************/
 route::resource("comercializacion/notaingreso",'Comercializacion\\NotaIngresoController');
 
-route::resource("comercializacion/notaingresoatipico",'Comercializacion\\NotaIngresoAController');
+route::resource("comercializacion/notaingresoatipico/create",'Comercializacion\\NotaIngresoAController');
