@@ -19,6 +19,12 @@
                 <div class="panel-heading">NOTA DE INGRESO</div>
                 <div class="panel-body">
 
+                <form action="{{ route('notaingreso.store') }}" method="POST">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="_method" value="POST">
+                    <input type="hidden" name="codint" id="codint" value="{{ $id }}">
+                    <input type="hidden" name="conta" id="conta" value="">
+
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <div class="row">
@@ -93,7 +99,7 @@
                                     <label for="">Rollos</label>
                                     <input id="rollo" type="text" class="form-control" name="rollo" >
                                 </div>
-                                <div class="col-md-2" style="text-align:right;">
+                                <div class="col-md-2" style="text-align:center;">
                                     <br>
                                     <div  id="add" class="btn btn-primary">agregar</div>
                                 </div>
@@ -109,78 +115,61 @@
                                     <br>
                                     <table id="bandeja-produccion" name="bandeja-produccion" class="table table-striped table-bordered table-hover">
                                         <thead>
-                                        <th>
-                                            Item
-                                        </th>
-                                        <th>
-                                            Fecha
-                                        </th>
-                                        <th>
-                                            Producto
-                                        </th>
-                                        <th>
-                                            Tienda
-                                        </th>
-                                        <th>
-                                            Partida
-                                        </th>
-                                        <th>
-                                            Color
-                                        </th>
-                                        <th>
-                                            Peso
-                                        </th>
-                                        <th>
-                                            Rollos
-                                        </th>
-                                        <th>
-                                            Print
-                                        </th>                                       
-                                        <th>
-                                            X
-                                        </th>
+                                            <th>
+                                                Item
+                                            </th>
+                                            <th>
+                                                Fecha
+                                            </th>
+                                            <th>
+                                                Producto
+                                            </th>
+                                            <th>
+                                                Tienda
+                                            </th>
+                                            <th>
+                                                Partida
+                                            </th>
+                                            <th>
+                                                Color
+                                            </th>
+                                            <th>
+                                                Peso
+                                            </th>
+                                            <th>
+                                                Rollos
+                                            </th>
+                                            <th>
+                                                Print
+                                            </th>                                       
+                                            <th>
+                                                X
+                                            </th>
                                         
                                         </thead>
                                         <tbody style="text-align: center;">
-                                            <tr id="fila_0">
-                                                <td>
-                                                    Item
-                                                </td>
-                                                <td>                                                
-                                                    Fecha
-                                                </td>
-                                                <td>
-                                                    Producto
-                                                </td>
-                                                <td>
-                                                    Tienda
-                                                </td>
-                                                <td>
-                                                    Partida
-                                                </td>
-                                                <td>
-                                                    Color
-                                                </td>
-                                                <td>
-                                                    Peso
-                                                </td>
-                                                <td>
-                                                    Rollos
-                                                </td>
-                                                <td>
-                                                    Print
-                                                </td>                                           
-                                                <td>
-                                                    <div id="del" class="btn btn-link" onclick="$('#fila_0').remove()">X</div>
-                                                </td>
-                                            </tr>
+                                            
+                                            
                                         </tbody>
                                     </table>
 
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    
+                                        <button class="btn btn-link">Registrar</button>
+                                    
+                                </div>
+                            </div>
+
+
+
                         </div>
                     </div>
+
+                    </form>
                 </div>
             </div>
         </div>
@@ -190,43 +179,36 @@
 
 @push('scripts')
 <script type="text/javascript">
+var indice_tabla=0;
     $(document).ready(function(){
         /**
          * Funcion para añadir una nueva columna en la tabla
          */
 
-         var indice_tabla=0;
+         
 
         $("#add").click(function(){
             // Obtenemos el numero de filas (td) que tiene la primera columna
-            // (tr) del id "tabla"
 
-            var datos_fila=[
-            $("#fecha_t").val(),
-            $("#producto_t").val(),
-            $("#tienda").val(),
-            $("#partida").val(),
-            $("#color_t").val(),
-            $("#peso").val(),
-            $("#rollo").val()];
-            
-
-            var tds=7;//$("#bandeja-produccion tr:first td").length;
-            
-            // Obtenemos el total de columnas (tr) del id "tabla"
-            var trs=$("#bandeja-produccion tr").length;
+            // Obtenemos el total de columnas (tr) del id "tabla"            
             indice_tabla++;
+            $("#conta").val(indice_tabla);
             var nuevaFila="<tr id=fila_"+indice_tabla+">";
-            nuevaFila+="<td>"+indice_tabla+"</td>";
-            for(var i=0;i<tds;i++){
-                // añadimos las columnas
-                nuevaFila+="<td>"+datos_fila[i]+"</td>";
-            }
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox2" value="">'+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+indice_tabla+"</td>";
+            
+            nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+$("#fecha_t").val()+'">'+$("#fecha_t").val()+"</td>";
+            nuevaFila+="<td>"+$("#producto_t").val()+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+$("#tienda").val()+'">'+$("#tienda").text()+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+$("#partida").val()+'">'+$("#partida").val()+"</td>";
+            nuevaFila+="<td>"+$("#color_t").val()+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso").val()+'">'+$("#peso").val()+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollo").val()+'">'+$("#rollo").val()+"</td>";
+
+            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" checked>'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick=$("#fila_'+indice_tabla+'").remove() >X</div>';//+(trs+1)+" columnas";
+            nuevaFila+='<td><div class="btn btn-link" onclick=$("#fila_'+indice_tabla+'").remove() >X</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
         });
@@ -235,7 +217,7 @@
          * Funcion para eliminar la ultima columna de la tabla.
          * Si unicamente queda una columna, esta no sera eliminada
          */
-        $("#del").click(function(){
+        /*$("#del").click(function(){
             // Obtenemos el total de columnas (tr) del id "tabla"
             var trs=$("#bandeja-produccion tr").length;
             if(trs>1)
@@ -243,7 +225,37 @@
                 // Eliminamos la ultima columna
                 $("#bandeja-produccion tr:last").remove();
             }
-        });
+        });*/
+
+        @foreach($bandejatabla as $tab_bandeja) 
+            addtabla("{{ $tab_bandeja->ning_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}");
+        @endforeach
+
+        
     });
+        function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll)
+        {
+            indice_tabla++;
+            $("#conta").val(indice_tabla);
+            var nuevaFila="<tr id=fila_"+indice_tabla+">";
+            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="'+cod+'">'+indice_tabla+"</td>";
+            
+            nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+fec+'">'+fec+"</td>";
+            nuevaFila+="<td>"+prod+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+tiecod+'">'+tie+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+par+'">'+par+"</td>";
+            nuevaFila+="<td>"+col+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'">'+pes+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'">'+roll+"</td>";
+
+            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" checked>'+"</td>";
+            // Añadimos una columna con el numero total de columnas.
+            // Añadimos uno al total, ya que cuando cargamos los valores para la
+            // columna, todavia no esta añadida
+            nuevaFila+='<td><div class="btn btn-link" onclick=$("#fila_'+indice_tabla+'").remove() >X</div>';
+            nuevaFila+="</tr>";
+            $("#bandeja-produccion").append(nuevaFila);
+            return 1;            
+        }
     </script>
 @endpush('scripts')

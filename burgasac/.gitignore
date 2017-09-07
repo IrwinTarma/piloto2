@@ -5,7 +5,7 @@
 .idea
 Homestead.json
 Homestead.yaml
-.env
+
 
 /public/css/frontend.css
 /public/css/frontend.css.map
