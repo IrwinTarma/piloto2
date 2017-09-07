@@ -28,11 +28,11 @@
                                 <label for="">Fecha</label>
                                 <input id="fecha" type="text" class="form-control" name="fecha" value="{{ $datosant->fecha }}">
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 <label for="">Control Interno</label>
                                 <input id="control" type="text" class="form-control" name="control" value="{{ $datosant->control }}">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label for="">Proveedor</label>
                                 <select id="proveedor" class="form-control" name="proveedor">
                                     <option value="">Todos</option>
@@ -62,7 +62,7 @@
                                 <br>
                                 <button type="submit" class=" signbuttons btn btn-primary">Buscar</button>                            
                             </div>
-                            <div class="col-md-1" style="text-align:center;">
+                            <div class="col-md-2" style="text-align:right;">
                                 <br>
                                 <a href="#"  id="buscar-tabla" class="btn btn-primary">Nuevo Ingreso</a>
                             </div>

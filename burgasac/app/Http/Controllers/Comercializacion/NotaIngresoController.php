@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comercializacion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Tienda;
+use Carbon\Carbon;
 use DB;
 
 
@@ -72,8 +73,9 @@ class NotaIngresoController extends Controller
         return back()->with('info','El proveedor fue eliminado.');
     }
 */
-    public function create($id)
+    public function show($id)
     {
+    	$tienda=Tienda::all();
    		$bandeja = DB::table('detalles_despacho_tintoreria')
             ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
@@ -90,10 +92,12 @@ class NotaIngresoController extends Controller
                 'detalles_despacho_tintoreria.producto_id',
                 'detalles_despacho_tintoreria.proveedor_id',
                 'detalles_despacho_tintoreria.nro_lote')            
-            ->where('detalles_despacho_tintoreria.id','like', '%'.$id.'%')        
-            ->get();
-
-    	return view("comercializacion.notaingreso.create",compact('bandeja'));
+            ->where('detalles_despacho_tintoreria.id','=', $id)
+            ->get()
+            ->first();
+            
+        $fecha=Carbon::now()->format('Y-m-d');
+    	return view("comercializacion.notaingreso.create",compact('bandeja','tienda','fecha'));
     }
   
 }
