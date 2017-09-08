@@ -8,9 +8,6 @@
     <!--style media="screen" type="text/css">/*<![CDATA[*/@import 'http://127.0.0.1:8000/cb/css/stylesheet.css';/*]]>*/</style-->
     <style type="text/css">#title,#glyphs p{font-family:"Code 128"}</style>
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	
-
 	
 	<div id="glyphs">
 		@foreach($noimpresos as $var)
