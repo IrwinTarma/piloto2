@@ -59,6 +59,7 @@ Route::get('/telas/{tela_id}/proveedor/{proveedor_id}/stock','Planeamiento\\Plan
 /**
  * Compras
  */
+
 Route::get('/verifica-guia','Compra\\ComprasController@verifica_guia');
 Route::get('/verifica-comprobante','Compra\\ComprasController@verifica_comprobante');
 
@@ -94,7 +95,6 @@ Route::get('compras/lote/{id}/detalles-accesorio','Compra\\ComprasController@det
 Route::post('lotesporproveedor', "Compra\ComprasController@getLotesporproveedor");
 Route::get('/boletacompra', "Compra\ComprasController@getPdf");
 
-
 /**
  * Devoluciones
  */
@@ -124,6 +124,13 @@ Route::get('comercializacion/comercializacion/reporte','Comercializacion\\Comerc
 Route::resource('comercializacion/comercializacion','Comercializacion\\ComercializacionController');
 
 /*********** BANDEJA DE RECEPCION DE TELA TEÑIDA *******************/
-route::resource("comercializacion/notaingreso",'Comercializacion\\NotaIngresoController');
+//route::resource("comercializacion/notaingreso",'Comercializacion\\NotaIngresoController');
 
 route::resource("comercializacion/notaingresoatipico",'Comercializacion\\NotaIngresoAController');
+
+Route::get('comercializacion/notaingreso/create/{id}', 'Comercializacion\\NotaIngresoController@create')->name('notaingreso.create');
+Route::get('comercializacion/notaingreso/show/{id}', 'Comercializacion\\NotaIngresoController@show')->name('notaingreso.show');
+Route::post('comercializacion/notaingreso/store', 'Comercializacion\\NotaIngresoController@store')->name('notaingreso.store');
+//Route::get('abono/abonos/create/{compra_id}', 'Abono\\AbonosController@create')->name('abono.compras.create');
+
+//Route::post('comercializacion/notaingreso', 'Comercializacion\\NotaIngresoController@store');

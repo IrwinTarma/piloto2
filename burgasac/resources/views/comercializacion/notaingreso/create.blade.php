@@ -25,6 +25,7 @@
                     <input type="hidden" name="codint" id="codint" value="{{ $id }}">
                     <input type="hidden" name="conta" id="conta" value="">
                     <input type="hidden" name="eliminados" id="eliminados" value="">
+                    <input type="hidden" name="actualizar" id="actualizar" value="">
 
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -76,7 +77,7 @@
                     </div>
 
                     <div class="panel panel-default">
-                        <div class="panel-body">
+                        <div class="panel-body" id="dina_control" name="dina_control">
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="">Tienda</label>                            
@@ -103,6 +104,7 @@
                                 <div class="col-md-2" style="text-align:center;">
                                     <br>
                                     <div  id="add" class="btn btn-primary">agregar</div>
+                                    <div  id="act" class="btn btn-primary" style="display:none;" onclick="actualiza()">actualizar</div>
                                 </div>
                             </div>
                         </div>
@@ -146,6 +148,9 @@
                                             <th>
                                                 X
                                             </th>
+                                            <th>
+                                                E
+                                            </th>
                                         
                                         </thead>
                                         <tbody style="text-align: center;">
@@ -182,6 +187,7 @@
 <script type="text/javascript">
 var indice_tabla=0;
     $(document).ready(function(){
+        //$("#act").hide();
         /**
          * Funcion para añadir una nueva columna en la tabla
          */
@@ -196,17 +202,18 @@ var indice_tabla=0;
             
             nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+$("#fecha_t").val()+'">'+$("#fecha_t").val()+"</td>";
             nuevaFila+="<td>"+$("#producto_t").val()+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+$("#tienda").val()+'">'+$("#tienda").text()+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+$("#partida").val()+'">'+$("#partida").val()+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+$("#tienda").val()+'"><p id="Ltie_'+indice_tabla+'">'+$("#tienda").text()+"</p></td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+$("#partida").val()+'"><p id="Lpar_'+indice_tabla+'">'+$("#partida").val()+"</p></td>";
             nuevaFila+="<td>"+$("#color_t").val()+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso").val()+'">'+$("#peso").val()+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollo").val()+'">'+$("#rollo").val()+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso").val()+'"><p id="Lpes_'+indice_tabla+'">'+$("#peso").val()+"</p></td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollo").val()+'"><p id="Lroll_'+indice_tabla+'">'+$("#rollo").val()+"</p></td>";
 
             nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="">'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
             nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
+            nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >E</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
         });
@@ -240,17 +247,18 @@ var indice_tabla=0;
             
             nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+fec+'">'+fec+"</td>";
             nuevaFila+="<td>"+prod+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+tiecod+'">'+tie+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+par+'">'+par+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+tiecod+'"><p id="Ltie_'+indice_tabla+'">'+tie+"</p></td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+par+'"><p id="Lpar_'+indice_tabla+'">'+par+"</p></td>";
             nuevaFila+="<td>"+col+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'">'+pes+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'">'+roll+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'"><p id="Lpes_'+indice_tabla+'">'+pes+"</p></td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'"><p id="Lroll_'+indice_tabla+'">'+roll+"</p></td>";
 
             nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" '+((imp==1)?"checked":"")+'>'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
             nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
+            nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >E</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
             return 1;            
@@ -261,6 +269,49 @@ var indice_tabla=0;
             datos= $("#eliminados").val()+","+$("#cod_ndi_"+id).val();
             $("#eliminados").val(datos);
             $("#fila_"+id).remove();
+        }
+
+        function editar(id)
+        {
+            $("#dina_control").css( "box-shadow","rgba(0, 0, 0, 0.75) 0px 4px 47px -5px"); 
+
+            $("#tienda").val($("#tie_"+id).val());
+            $("#partida").val($("#par_"+id).val());
+            $("#peso").val($("#pes_"+id).val());
+            $("#rollo").val($("#roll_"+id).val());
+
+            $("#partida").attr('disabled','disabled');
+
+            $("#actualizar").val(id);
+
+            $("#act").show();
+            $("#add").hide();   
+        }
+
+        function actualiza()
+        {
+            var id=$("#actualizar").val();
+            $("#tie_"+id).val($("#tienda").val());
+            $("#par_"+id).val($("#partida").val());
+            $("#pes_"+id).val($("#peso").val());
+            $("#roll_"+id).val($("#rollo").val());            
+            
+            $("#Ltie_"+id).text($("#tienda option:selected").html());
+            $("#Lpar_"+id).text($("#partida").val());
+            $("#Lpes_"+id).text($("#peso").val());
+            $("#Lroll_"+id).text($("#rollo").val());
+
+            $("#partida").removeAttr('disabled');
+
+            $("#dina_control").css( "box-shadow","none"); 
+
+            $("#tienda").val("1");
+            $("#partida").val("");
+            $("#peso").val("");
+            $("#rollo").val("");
+
+            $("#act").hide();
+            $("#add").show();
         }
     </script>
 @endpush('scripts')

@@ -130,10 +130,10 @@
                                             {{ $band->estado }}
                                         </td>
                                         <td>
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
+                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
                                             <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> | 
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Cerrar</a> | 
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">X</a>
+                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Cerrar</a> | 
+                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">X</a>
                                         </td>                                    
                                     </tr>
                                 @endforeach
