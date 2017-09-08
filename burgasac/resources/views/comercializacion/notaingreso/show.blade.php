@@ -140,28 +140,21 @@
                                             <th>
                                                 Rollos
                                             </th>
-                                            <th>
-                                                Print
-                                            </th>                                       
-                                            <th>
-                                                X
-                                            </th>
-                                        
+                                                                                  
                                         </thead>
                                         <tbody style="text-align: center;">
                                             
                                             
                                         </tbody>
                                     </table>
-
+                                    {!! $bandejatabla->render() !!}
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    
                                         <!--button class="btn btn-primary">Guardar</button-->
-                                    
+                                        <a href="{{ route('comercializacion.index')}}" class="btn btn-primary">Volver</a>
                                 </div>
                             </div>
 
@@ -246,11 +239,11 @@ var indice_tabla=0;
             nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'">'+pes+"</td>";
             nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'">'+roll+"</td>";
 
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" '+((imp==1)?"checked":"")+'>'+"</td>";
+            //nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" '+((imp==1)?"checked":"")+'>'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
+            //nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
             return 1;            

@@ -21,6 +21,9 @@ use Session;
 use App\DetallePlaneamiento;
 use Yajra\Datatables\Facades\Datatables;
 use DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ComercializacionController extends Controller
 {
@@ -31,7 +34,7 @@ class ComercializacionController extends Controller
         $productos = Producto::all();
 
         $bandeja = DB::table('detalles_despacho_tintoreria')
-            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
             ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
             ->select('detalles_despacho_tintoreria.created_at',
@@ -51,7 +54,7 @@ class ComercializacionController extends Controller
             ->where('detalles_despacho_tintoreria.proveedor_id','like', '%'.$request->proveedor.'%')
             ->where('detalles_despacho_tintoreria.producto_id','like', '%'.$request->producto.'%')
             ->where('detalles_despacho_tintoreria.estado','like', '%'.$request->estado.'%')
-            ->get();
+            ->paginate(10);
 
         $datosant=$request;
 
@@ -60,39 +63,14 @@ class ComercializacionController extends Controller
 
     }
 
-    /*public function show($fecha)
+    public function update(Request $request,$id)
     {
-        $proveedores = Proveedor::all();
-        $empleados = Empleado::all();
-        $productos = Producto::all();
+        $ddt=DetalleDespachoTintoreria::find($id);
+        $ddt->estado=1;                
+        $ddt->save();
 
-        $bandeja = DB::table('detalles_despacho_tintoreria')
-            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
-            ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
-            ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
-            ->select('detalles_despacho_tintoreria.created_at',
-                'detalles_despacho_tintoreria.id', 
-                'proveedores.razon_social', 
-                'productos.nombre_generico',
-                'detalles_despacho_tintoreria.cantidad',
-                'detalles_despacho_tintoreria.rollos',
-                'color.nombre',
-                'detalles_despacho_tintoreria.estado',
-                'detalles_despacho_tintoreria.color_id',
-                'detalles_despacho_tintoreria.producto_id',
-                'detalles_despacho_tintoreria.proveedor_id',
-                'detalles_despacho_tintoreria.nro_lote')
-            ->where('detalles_despacho_tintoreria.created_at', 'like', '%'.$fecha.'%')
-            ->where('detalles_despacho_tintoreria.id','like', '%%')
-            ->where('proveedores.razon_social','like', '%%')
-            ->where('productos.nombre_generico','like', '%%')
-            ->where('detalles_despacho_tintoreria.estado','like', '%1%')
-            ->get();
-
-        return view('comercializacion.index',
-            compact('proveedores','empleados','productos','bandeja'));
-
-    }*/
+        return redirect()->route('comercializacion.index')->with('info','El detalle fue cerrado.');  
+    }
 }
 
 

@@ -54,17 +54,17 @@
                             <div class="col-md-1">
                                 <label for="">Estado</label>
                                 <select class="form-control" name="estado" id="estado">
-                                    <option value="1">Abierto</option>
-                                    <option value="2">Cerrado</option>
+                                    <option value="0">Abierto</option>
+                                    <option value="1">Cerrado</option>
                                 </select>
                             </div>
-                            <div class="col-md-1" style="text-align:right;">
+                            <div class="col-md-1" style="text-align:center;">
                                 <br>
                                 <button type="submit" class=" signbuttons btn btn-primary">Buscar</button>                            
                             </div>
-                            <div class="col-md-2" style="text-align:right;">
+                            <div class="col-md-2" style="text-align:center;">
                                 <br>
-                                <a href="#"  id="buscar-tabla" class="btn btn-primary">Nuevo Ingreso</a>
+                                <a href="{{ route('notaingresoatipico.create') }}" id="buscar-tabla" class="btn btn-primary">Nuevo Ingreso</a>
                             </div>
 
                         </form>
@@ -127,19 +127,30 @@
                                             {{ $band->nombre }}
                                         </td>
                                         <td>
-                                            {{ $band->estado }}
+                                            {{ ($band->estado==0)?"Abierto":"Cerrado" }}
                                         </td>
                                         <td>
-                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
+                                            @if($band->estado==0)
+                                                <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
+                                            @else
+                                                <a href="javascript:alert('El detalle está cerrado.')" class="btn btn-link" style="color:#67696b;">Crear / Editar</a> | 
+                                            @endif
                                             <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> | 
-                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Cerrar</a> | 
-                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">X</a>
+                                            <a href="javascript:cerrar('{{ $band->id }}')" class="btn btn-link">cerrar</a>
+                                            <form action="{{ route('comercializacion.update',$band->id) }}" method="POST" id="postcerrar_{{ $band->id }}">
+                                                {{ csrf_field() }}
+                                                <input type="hidden" name="_method" value="PUT">
+                                                <!--button class="btn btn-link">cerrar</button-->
+                                            </form>
+                                             <!--| 
+                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">X</a-->
+                                            
                                         </td>                                    
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
-
+                            {!! $bandeja->render() !!}
                         </div>
                     </div>
                 </div>
@@ -271,6 +282,14 @@
         }).on("clearDate", function(e) {
             return false;
         });
+
+        function cerrar(id) 
+        {
+            if (window.confirm("¿Está seguro que desea cerrar el registro, si lo hace no podrá abrirlo nuevamente?")) 
+            {
+                $("#postcerrar_"+id).submit();
+            }
+        }
     </script>
 
 @endpush

@@ -1,16 +1,5 @@
 @extends('backend.layouts.appv2')
 
-@section('after-styles')
-    <style>
-        .dropdown{padding: 0;}
-        .dropdown .dropdown-menu{border: 1px solid #999}
-        .detallescompra{
-            display: none;
-            background-color: #ececec;
-        }
-    </style>
-@stop
-
 @section('content')
 
     <div class="row">
@@ -19,13 +8,14 @@
                 <div class="panel-heading">NOTA DE INGRESO</div>
                 <div class="panel-body">
 
-                <form action="{{ route('notaingreso.store') }}" method="POST">
+                <form action="{{ route('notaingreso.store') }}" method="POST" onkeypress="return anular(event)">
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="POST">
                     <input type="hidden" name="codint" id="codint" value="{{ $id }}">
                     <input type="hidden" name="conta" id="conta" value="">
                     <input type="hidden" name="eliminados" id="eliminados" value="">
                     <input type="hidden" name="actualizar" id="actualizar" value="">
+                    <input type="hidden" name="cad_actt" id="cad_actt" value="">
 
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -90,20 +80,20 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="">Partida</label>
-                                    <input id="partida" type="text" class="form-control" name="partida" autofocus="autofocus">
+                                    <input id="partida" type="text" class="form-control" name="partida" placeholder="# partida" onkeypress="return tabular(event,this)" autofocus="autofocus" tabindex="1">
                                 </div>
                                 <div class="col-md-2">
                                     <label for="">Peso</label>
-                                    <input id="peso" type="text" class="form-control" name="peso" >
+                                    <input id="peso" type="text" class="form-control" name="peso" placeholder="peso o cantidad" onkeypress="return tabular(event,this)" tabindex="2">
                                 </div>
 
                                 <div class="col-md-2">
                                     <label for="">Rollos</label>
-                                    <input id="rollo" type="text" class="form-control" name="rollo" >
+                                    <input id="rollo" type="text" class="form-control" name="rollo" placeholder="rollos" tabindex="3">
                                 </div>
                                 <div class="col-md-2" style="text-align:center;">
                                     <br>
-                                    <div  id="add" class="btn btn-primary">agregar</div>
+                                    <div  id="add" class="btn btn-primary" tabindex="4">agregar</div>
                                     <div  id="act" class="btn btn-primary" style="display:none;" onclick="actualiza()">actualizar</div>
                                 </div>
                             </div>
@@ -158,15 +148,14 @@
                                             
                                         </tbody>
                                     </table>
-
+                                    {!! $bandejatabla->render() !!}
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    
-                                        <button class="btn btn-primary">Guardar</button>
-                                    
+                                        <button class="btn btn-success">Guardar</button>
+                                        <a href="{{ route('comercializacion.index')}}" class="btn btn-primary">Volver</a>
                                 </div>
                             </div>
 
@@ -187,36 +176,45 @@
 <script type="text/javascript">
 var indice_tabla=0;
     $(document).ready(function(){
+
+        $('#rollo').numeric();
+        $('#peso').numeric(",");
         //$("#act").hide();
         /**
          * Funcion para añadir una nueva columna en la tabla
          */
-        $("#add").click(function(){
-            // Obtenemos el numero de filas (td) que tiene la primera columna
+        
+            $("#add").click(function(){
+            if(validacion()==0)
+            {
+                // Obtenemos el numero de filas (td) que tiene la primera columna
 
-            // Obtenemos el total de columnas (tr) del id "tabla"            
-            indice_tabla++;
-            $("#conta").val(indice_tabla);
-            var nuevaFila="<tr id=fila_"+indice_tabla+">";
-            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+indice_tabla+"</td>";
-            
-            nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+$("#fecha_t").val()+'">'+$("#fecha_t").val()+"</td>";
-            nuevaFila+="<td>"+$("#producto_t").val()+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+$("#tienda").val()+'"><p id="Ltie_'+indice_tabla+'">'+$("#tienda").text()+"</p></td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+$("#partida").val()+'"><p id="Lpar_'+indice_tabla+'">'+$("#partida").val()+"</p></td>";
-            nuevaFila+="<td>"+$("#color_t").val()+"</td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso").val()+'"><p id="Lpes_'+indice_tabla+'">'+$("#peso").val()+"</p></td>";
-            nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollo").val()+'"><p id="Lroll_'+indice_tabla+'">'+$("#rollo").val()+"</p></td>";
+                // Obtenemos el total de columnas (tr) del id "tabla"            
+                indice_tabla++;
+                $("#conta").val(indice_tabla);
+                var nuevaFila="<tr id=fila_"+indice_tabla+">";
+                nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+indice_tabla+"</td>";
+                
+                nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+$("#fecha_t").val()+'">'+$("#fecha_t").val()+"</td>";
+                nuevaFila+="<td>"+$("#producto_t").val()+"</td>";
+                nuevaFila+="<td>"+'<input type="hidden" name="tie_'+indice_tabla+'" id="tie_'+indice_tabla+'" value="'+$("#tienda").val()+'"><p id="Ltie_'+indice_tabla+'">'+$("#tienda option:selected").html()+"</p></td>";
+                nuevaFila+="<td>"+'<input type="hidden" name="par_'+indice_tabla+'" id="par_'+indice_tabla+'" value="'+$("#partida").val()+'"><p id="Lpar_'+indice_tabla+'">'+$("#partida").val()+"</p></td>";
+                nuevaFila+="<td>"+$("#color_t").val()+"</td>";
+                nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso").val()+'"><p id="Lpes_'+indice_tabla+'">'+$("#peso").val()+"</p></td>";
+                nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollo").val()+'"><p id="Lroll_'+indice_tabla+'">'+$("#rollo").val()+"</p></td>";
 
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="">'+"</td>";
-            // Añadimos una columna con el numero total de columnas.
-            // Añadimos uno al total, ya que cuando cargamos los valores para la
-            // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
-            nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >E</div>';
-            nuevaFila+="</tr>";
-            $("#bandeja-produccion").append(nuevaFila);
-        });
+                nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="1">'+"</td>";
+                // Añadimos una columna con el numero total de columnas.
+                // Añadimos uno al total, ya que cuando cargamos los valores para la
+                // columna, todavia no esta añadida
+                nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
+                nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >E</div>';
+                nuevaFila+="</tr>";
+                $("#bandeja-produccion").append(nuevaFila);
+            }   
+
+            });
+        
  
         /**
          * Funcion para eliminar la ultima columna de la tabla.
@@ -236,10 +234,26 @@ var indice_tabla=0;
             addtabla("{{ $tab_bandeja->dNotIng_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}");
         @endforeach
 
-        
     });
-        function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll,imp)
+
+    $(document).bind('keydown',function(e){
+        if ( e.which == 27 ) 
         {
+            cancelar();
+        };
+    });
+
+
+    $("#rollo").bind('keydown',function(e){
+        if ( e.which == 13 ) 
+        {
+            $('#add').click();
+        };
+    });            
+    
+
+        function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll,imp)
+        {        
             indice_tabla++;
             $("#conta").val(indice_tabla);
             var nuevaFila="<tr id=fila_"+indice_tabla+">";
@@ -253,22 +267,27 @@ var indice_tabla=0;
             nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'"><p id="Lpes_'+indice_tabla+'">'+pes+"</p></td>";
             nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'"><p id="Lroll_'+indice_tabla+'">'+roll+"</p></td>";
 
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" '+((imp==1)?"checked":"")+'>'+"</td>";
+            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="1" '+((imp==1)?"checked":"")+'>'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >X</div>';
-            nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >E</div>';
+            nuevaFila+='<td><div class="btn btn-link" id="cdel_'+indice_tabla+'"  onclick="delTabla('+indice_tabla+')" >X</div>';
+            nuevaFila+='<td><div class="btn btn-link" id="cedi_'+indice_tabla+'" onclick="editar('+indice_tabla+')" >E</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
             return 1;            
+        
         }
 
         function delTabla(id)
-        {            
-            datos= $("#eliminados").val()+","+$("#cod_ndi_"+id).val();
-            $("#eliminados").val(datos);
-            $("#fila_"+id).remove();
+        {     
+            
+            if(confirm('Nota: El registro se retirará momentaneamente, pero el cambio no se hará efecto hasta que usted guarde los cambios.'))
+            {
+                var datos= $("#eliminados").val()+","+$("#cod_ndi_"+id).val();
+                $("#eliminados").val(datos);
+                $("#fila_"+id).remove();
+            }            
         }
 
         function editar(id)
@@ -281,6 +300,8 @@ var indice_tabla=0;
             $("#rollo").val($("#roll_"+id).val());
 
             $("#partida").attr('disabled','disabled');
+            $("#cdel_"+id).hide();
+            $("#cedi_"+id).hide();
 
             $("#actualizar").val(id);
 
@@ -302,6 +323,35 @@ var indice_tabla=0;
             $("#Lroll_"+id).text($("#rollo").val());
 
             $("#partida").removeAttr('disabled');
+            $("#cdel_"+id).show();
+            $("#cedi_"+id).show();
+
+            $("#dina_control").css( "box-shadow","none"); 
+
+            $("#tienda").val("1");
+            $("#partida").val("");
+            $("#peso").val("");
+            $("#rollo").val("");
+
+            $("#act").hide();
+            $("#add").show();
+
+            //verificar si hay  cambios 
+            if($("#tie_"+id).val()!=$("#tienda").val() || $("#pes_"+id).val()!=$("#peso").val() || $("#roll_"+id).val()!=$("#rollo").val())
+            {                
+                var datos= $("#cad_actt").val()+","+$("#cod_ndi_"+id).val();
+                $("#cad_actt").val(datos);
+            }
+            
+            //si hay agregar al input .... el código
+
+        }
+        function cancelar()
+        {
+            var id=$("#actualizar").val();
+            $("#partida").removeAttr('disabled');
+            $("#cdel_"+id).show();
+            $("#cedi_"+id).show();
 
             $("#dina_control").css( "box-shadow","none"); 
 
@@ -313,5 +363,61 @@ var indice_tabla=0;
             $("#act").hide();
             $("#add").show();
         }
+
+         function anular(e) {
+              tecla = (document.all) ? e.keyCode : e.which;
+              return (tecla != 13);
+         }
+         function validacion()
+         {
+            var par_=$.trim($("#partida").val());
+            var pes_=$.trim($("#peso").val());
+            var rol_=$.trim($("#rollo").val());
+            var key_error=false;
+            
+            if(par_=="")
+            {
+                $("#partida").css("border","2px solid #f00");                
+                key_error=true;
+            }
+            else
+                $("#partida").css("border","1px solid #d2d6de");
+
+            if(pes_=="")
+            {
+                $("#peso").css("border","2px solid #f00");                
+                key_error=true;
+            }
+            else
+                $("#peso").css("border","1px solid #d2d6de");
+
+            if(rol_=="")
+            {
+                $("#rollo").css("border","2px solid #f00");
+                key_error=true;
+            }
+            else
+                $("#rollo").css("border","1px solid #d2d6de");
+
+            return (key_error)?1:0;
+         }
+
+
     </script>
+    <script>
+       function tabular(e,obj) {
+         tecla=(document.all) ? e.keyCode : e.which;
+         if(tecla!=13) return;
+         frm=obj.form;
+         for(i=0;i<frm.elements.length;i++)
+           if(frm.elements[i]==obj) {
+             if (i==frm.elements.length-1) i=-1;
+             break }
+         frm.elements[i+1].focus();
+         return false;
+       }
+
+       if(!("autofocus" in document.createElement("input")))
+           document.getElementById("uno").focus();
+   </script>
 @endpush('scripts')

@@ -9,7 +9,9 @@ use App\NotaIngreso;
 use App\DetalleNotaIngreso;
 use Carbon\Carbon;
 use DB;
-
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class NotaIngresoController extends Controller
 {
@@ -64,7 +66,6 @@ class NotaIngresoController extends Controller
 			}
 			/************************ FIN ELMINACION *******************************/
 
-
 			for($i=1;$i<=$request->conta;$i++)
 			{
 				if($request["cod_ndi_".$i]!="")
@@ -89,6 +90,9 @@ class NotaIngresoController extends Controller
 					}
 				}
 			}
+
+            $arraycad_actt=explode(",", $request->cad_actt);
+
 			//Recorrer, buscar el reg de la partida y fecha y registrar
 			for($i=1;$i<=$request->conta;$i++)
 			{
@@ -105,45 +109,46 @@ class NotaIngresoController extends Controller
 							$DetalleNotaIngreso=new DetalleNotaIngreso;
 							$DetalleNotaIngreso->nIng_id=$nIng_id->nIng_id;
 							$DetalleNotaIngreso->tienda_id=$request["tie_".$i];
-							$DetalleNotaIngreso->cod_barras="código de prueba";
+							$DetalleNotaIngreso->cod_barras=$nIng_id->nIng_id.$request["fec_".$i]."-".$request["tie_".$i];
 							$DetalleNotaIngreso->peso_cant=$request["pes_".$i];
 							$DetalleNotaIngreso->rollo=$request["roll_".$i];
-							$DetalleNotaIngreso->impreso="1";
+							$DetalleNotaIngreso->impreso="0";
 							$DetalleNotaIngreso->fecha=$request["fec_".$i];
 
 					        $DetalleNotaIngreso->save();
 					    
 				    }
+                    else
+                    {
+                        /**************************** ACTUALIZAR *******************************/
+                            if(in_array($request["cod_ndi_".$i], $arraycad_actt, true))
+                            {
+                                DetalleNotaIngreso::where('dNotIng_id',"=",$request["cod_ndi_".$i])                              
+                                ->update(['tienda_id' => $request["tie_".$i],'peso_cant' => $request["pes_".$i],'rollo' => $request["roll_".$i]]);    
+                            }
+                        /**************************** FIN ACTUALIZAR ***************************/
+                    }
 				}
 			}
 
+
+            $noimpresos = DetalleNotaIngreso::leftJoin('nota_ingreso', 'detalle_nota_ingreso.ning_id', '=', 'nota_ingreso.ning_id')
+                ->select('detalle_nota_ingreso.cod_barras')
+                ->where('nota_ingreso.desptint_id','=', $request->codint)
+                ->where('detalle_nota_ingreso.impreso','=',"0")            
+                ->get();
 		//});
-
-       return redirect()->route('notaingreso.create',$request->codint)->with('info','Las notas se crearon correctamente.'); 
+            
+            return view("comercializacion.notaingreso.impresion",compact("noimpresos"));
+       //return redirect()->route('notaingreso.create',$request->codint)->with('info','Las notas se crearon correctamente.'); 
     }
-/*
-    public function update(Request $request,$id)
-    {
-        $provedor=provedor::find($id);
-        $provedor->nProvRuc=$request->ruc;
-        $provedor->cProvNom=$request->nombre;
-        $provedor->cProvDir=$request->dir;
-        $provedor->cProvTel=$request->tel;
-        $provedor->cProvCel=$request->cel;            
-        $provedor->cProvEma=$request->email;
-        $provedor->cProvObs=$request->obs;
-        
-        $provedor->save();
 
-        return redirect()->route('provedor.show',$id)->with('info','El proveedor fue actualizado.');  
-    }
-*/
     public function show($id)
     {
 
         $tienda=Tienda::all();
         $bandeja = DB::table('detalles_despacho_tintoreria')
-            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
             ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
             ->select('detalles_despacho_tintoreria.created_at',
@@ -167,7 +172,7 @@ class NotaIngresoController extends Controller
             ->leftJoin('tienda', 'detalle_nota_ingreso.tienda_id', '=', 'tienda.tienda_id')
             ->leftJoin('detalles_despacho_tintoreria', 'nota_ingreso.desptint_id', '=', 'detalles_despacho_tintoreria.id')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
-            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
 
             ->select('detalle_nota_ingreso.dNotIng_id',
                 'nota_ingreso.ning_id',
@@ -181,32 +186,19 @@ class NotaIngresoController extends Controller
                 'detalle_nota_ingreso.rollo',
                 'detalle_nota_ingreso.impreso')
             ->where('nota_ingreso.desptint_id','=', $id)
-            ->orderBy('detalle_nota_ingreso.fecha',"Asc")
-            ->get();
+            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")
+            ->paginate(5);
 
 
         $fecha=Carbon::now()->format('Y-m-d');
         return view("comercializacion.notaingreso.show",compact('bandeja','tienda','fecha','id','bandejatabla'));
     }
-/*
-    public function edit($id)
-    {
-    	$provedor=provedor::where('nProvCod','=',$id)->get();
-    	return view("provedor.edit",compact("provedor"));
-    }
 
-    public function destroy($id)
-    {
-        $provedor=provedor::where('nProvCod','=',$id);
-        $provedor->delete();
-        return back()->with('info','El proveedor fue eliminado.');
-    }
-*/
     public function create($id)
     {
     	$tienda=Tienda::all();
    		$bandeja = DB::table('detalles_despacho_tintoreria')
-            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
             ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
             ->select('detalles_despacho_tintoreria.created_at',
@@ -230,7 +222,7 @@ class NotaIngresoController extends Controller
             ->leftJoin('tienda', 'detalle_nota_ingreso.tienda_id', '=', 'tienda.tienda_id')
             ->leftJoin('detalles_despacho_tintoreria', 'nota_ingreso.desptint_id', '=', 'detalles_despacho_tintoreria.id')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
-            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
 
             ->select('detalle_nota_ingreso.dNotIng_id',
             	'nota_ingreso.ning_id',
@@ -244,12 +236,17 @@ class NotaIngresoController extends Controller
             	'detalle_nota_ingreso.rollo',
             	'detalle_nota_ingreso.impreso')
             ->where('nota_ingreso.desptint_id','=', $id)
-            ->orderBy('detalle_nota_ingreso.fecha',"Asc")
-            ->get();
+            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")
+            ->paginate(5);
 
 
         $fecha=Carbon::now()->format('Y-m-d');
     	return view("comercializacion.notaingreso.create",compact('bandeja','tienda','fecha','id','bandejatabla'));
     }
-  
+    
+    public function impresion($id)
+    {
+        $v=1;
+        return view("comercializacion.notaingreso.impresion",compact("v"));
+    }  
 }
