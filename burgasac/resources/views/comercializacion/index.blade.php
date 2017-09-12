@@ -132,11 +132,12 @@
                                         <td>
                                             @if($band->estado==0)
                                                 <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
-                                            @else
-                                                <a href="javascript:alert('El detalle está cerrado.')" class="btn btn-link" style="color:#67696b;">Crear / Editar</a> | 
                                             @endif
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> | 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> 
+                                            @if($band->estado==0)
+                                            | 
                                             <a href="javascript:cerrar('{{ $band->id }}')" class="btn btn-link">cerrar</a>
+                                            @endif
                                             <form action="{{ route('comercializacion.update',$band->id) }}" method="POST" id="postcerrar_{{ $band->id }}">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="_method" value="PUT">

@@ -72,11 +72,11 @@
 
                                 <div class="col-md-2">
                                     <label for="">Peso</label>
-                                    <input id="peso_t" type="text" class="form-control" name="peso_t" value="" placeholder="Peso" onkeypress="return tabular(event,this)" tabindex="2" autofocus="autofocus">
+                                    <input id="peso_t" type="text" class="form-control" name="peso_t" value="" maxlength="6" placeholder="Peso" onkeypress="return tabular(event,this)" tabindex="2" autofocus="autofocus">
                                 </div>
                                 <div class="col-md-2">
                                     <label for="">Rollos</label>
-                                    <input id="rollos_t" type="text" class="form-control" name="rollos_t" value="" placeholder="Rollos" tabindex="3">
+                                    <input id="rollos_t" type="text" class="form-control" name="rollos_t" value="" maxlength="9" placeholder="Rollos" tabindex="3">
                                 </div>
                                 <div class="col-md-2" style="text-align:center;">
                                     <br>
@@ -140,7 +140,7 @@
                             <div class="row">
                                 <div class="col-md-12">                                    
                                     <button class="btn btn-success">Guardar</button>
-                                    <a href="{{ route('comercializacion.index')}}" class="btn btn-primary">Volver</a>         
+                                    <a href="{{ route('comercializacion.index')}}" class="btn btn-primary">Bandeja</a>         
                                 </div>
                             </div>
                         </div>
@@ -185,7 +185,8 @@ var indice_tabla=0;
                 nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+$("#peso_t").val()+'"><p id="Lpes_'+indice_tabla+'">'+$("#peso_t").val()+"</p></td>";
                 nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+$("#rollos_t").val()+'"><p id="Lroll_'+indice_tabla+'">'+$("#rollos_t").val()+"</p></td>";
 
-                nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="">'+"</td>";
+                //nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="">'+"</td>";
+                nuevaFila+="<td>"+'<input type="hidden" name="cb_'+indice_tabla+'" id="cb_'+indice_tabla+'" value=""><input type="checkbox" id="cbox_'+indice_tabla+'" name="cbox_'+indice_tabla+'">'+"</td>";
                 // Añadimos una columna con el numero total de columnas.
                 // Añadimos uno al total, ya que cuando cargamos los valores para la
                 // columna, todavia no esta añadida
@@ -225,7 +226,7 @@ var indice_tabla=0;
         });*/
 
         @foreach($bandejatabla as $tab_bandeja) 
-            addtabla("{{ $tab_bandeja->dNotInga_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->id }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->id_color }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}");
+            addtabla("{{ $tab_bandeja->dNotInga_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->id }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->id_color }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}","{{ $tab_bandeja->cod_barras }}");
         @endforeach
 
     });
@@ -246,7 +247,7 @@ var indice_tabla=0;
     });            
     
 
-        function addtabla(cod,fec,procod,prod,tiecod,tie,par,colid,col,pes,roll,imp)
+        function addtabla(cod,fec,procod,prod,tiecod,tie,par,colid,col,pes,roll,imp,cb)
         {        
             indice_tabla++;
             $("#conta").val(indice_tabla);
@@ -261,7 +262,7 @@ var indice_tabla=0;
             nuevaFila+="<td>"+'<input type="hidden" name="pes_'+indice_tabla+'" id="pes_'+indice_tabla+'" value="'+pes+'"><p id="Lpes_'+indice_tabla+'">'+pes+"</p></td>";
             nuevaFila+="<td>"+'<input type="hidden" name="roll_'+indice_tabla+'" id="roll_'+indice_tabla+'" value="'+roll+'"><p id="Lroll_'+indice_tabla+'">'+roll+"</p></td>";
 
-            nuevaFila+="<td>"+'<input type="checkbox" id="cbox_'+indice_tabla+'" value="" '+((imp==1)?"checked":"")+'>'+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="cb_'+indice_tabla+'" id="cb_'+indice_tabla+'" value="'+cb+'"><input type="checkbox" id="cbox_'+indice_tabla+'" name="cbox_'+indice_tabla+'" '+"checked"+'>'+"</td>";
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida

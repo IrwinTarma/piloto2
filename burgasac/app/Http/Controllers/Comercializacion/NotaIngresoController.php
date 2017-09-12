@@ -92,6 +92,7 @@ class NotaIngresoController extends Controller
 			}
 
             $arraycad_actt=explode(",", $request->cad_actt);
+            $noimpresos_ = array();
 
 			//Recorrer, buscar el reg de la partida y fecha y registrar
 			for($i=1;$i<=$request->conta;$i++)
@@ -109,14 +110,27 @@ class NotaIngresoController extends Controller
 							$DetalleNotaIngreso=new DetalleNotaIngreso;
 							$DetalleNotaIngreso->nIng_id=$nIng_id->nIng_id;
 							$DetalleNotaIngreso->tienda_id=$request["tie_".$i];
-							$DetalleNotaIngreso->cod_barras=$nIng_id->nIng_id.$request["fec_".$i]."-".$request["tie_".$i];
+							$DetalleNotaIngreso->cod_barras="";
 							$DetalleNotaIngreso->peso_cant=$request["pes_".$i];
 							$DetalleNotaIngreso->rollo=$request["roll_".$i];
-							$DetalleNotaIngreso->impreso="0";
+							$DetalleNotaIngreso->impreso="1";
 							$DetalleNotaIngreso->fecha=$request["fec_".$i];
 
 					        $DetalleNotaIngreso->save();
-					    
+
+                            $codi=DetalleNotaIngreso::select('dNotIng_id')
+                            ->orderBy('dNotIng_id','Desc')                      
+                            ->get()
+                            ->first();			
+
+                            $cb=$codi->dNotIng_id."-".$request["fec_".$i];		    
+                            
+
+                            DetalleNotaIngreso::where('dNotIng_id',"=",$codi->dNotIng_id)                              
+                                ->update(['cod_barras' => $cb]); 
+
+                            if(!isset($request["cbox_".$i]))//agregam los codigos de barra que estan sin marcar
+                                array_push($noimpresos_, $cb);
 				    }
                     else
                     {
@@ -124,23 +138,26 @@ class NotaIngresoController extends Controller
                             if(in_array($request["cod_ndi_".$i], $arraycad_actt, true))
                             {
                                 DetalleNotaIngreso::where('dNotIng_id',"=",$request["cod_ndi_".$i])                              
-                                ->update(['tienda_id' => $request["tie_".$i],'peso_cant' => $request["pes_".$i],'rollo' => $request["roll_".$i]]);    
+                                ->update(['tienda_id' => $request["tie_".$i],'peso_cant' => $request["pes_".$i],'rollo' => $request["roll_".$i]]);   
                             }
+
+                            if(!isset($request["cbox_".$i]))//agregam los codigos de barra que estan sin marcar
+                                array_push($noimpresos_, $request["cb_".$i]); 
                         /**************************** FIN ACTUALIZAR ***************************/
                     }
 				}
 			}
 
-
-            $noimpresos = DetalleNotaIngreso::leftJoin('nota_ingreso', 'detalle_nota_ingreso.ning_id', '=', 'nota_ingreso.ning_id')
-                ->select('detalle_nota_ingreso.cod_barras')
-                ->where('nota_ingreso.desptint_id','=', $request->codint)
-                ->where('detalle_nota_ingreso.impreso','=',"0")            
-                ->get();
-		//});
-            
-            return view("comercializacion.notaingreso.impresion",compact("noimpresos"));
-       //return redirect()->route('notaingreso.create',$request->codint)->with('info','Las notas se crearon correctamente.'); 
+            if(empty($noimpresos_))            
+                return redirect()->route('notaingreso.create',$request->codint)->with('info','Las notas se crearon correctamente.');        
+            else
+            {
+                $cod_ndi=$request->codint;                            
+                $noimpresos=json_encode($noimpresos_,true);                
+                
+                return view("comercializacion.notaingreso.impresion",compact("noimpresos","cod_ndi"));
+            }            
+       
     }
 
     public function show($id)
@@ -184,10 +201,11 @@ class NotaIngresoController extends Controller
                 'color.nombre',
                 'detalle_nota_ingreso.peso_cant',
                 'detalle_nota_ingreso.rollo',
-                'detalle_nota_ingreso.impreso')
+                'detalle_nota_ingreso.impreso',
+                'detalle_nota_ingreso.cod_barras')
             ->where('nota_ingreso.desptint_id','=', $id)
             ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")
-            ->paginate(5);
+            ->paginate(10);
 
 
         $fecha=Carbon::now()->format('Y-m-d');
@@ -234,10 +252,11 @@ class NotaIngresoController extends Controller
             	'color.nombre',
             	'detalle_nota_ingreso.peso_cant',
             	'detalle_nota_ingreso.rollo',
-            	'detalle_nota_ingreso.impreso')
+            	'detalle_nota_ingreso.impreso',
+                'detalle_nota_ingreso.cod_barras')
             ->where('nota_ingreso.desptint_id','=', $id)
             ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")
-            ->paginate(5);
+            ->paginate(10);
 
 
         $fecha=Carbon::now()->format('Y-m-d');

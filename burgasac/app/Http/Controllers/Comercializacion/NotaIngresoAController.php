@@ -117,7 +117,7 @@ class NotaIngresoAController extends Controller
             }
 
             $arraycad_actt=explode(",", $request->cad_actt);
-
+            $noimpresos_ = array();
 
             //Recorrer, buscar el reg de la partida y fecha y registrar
             for($i=1;$i<=$request->conta;$i++)
@@ -135,7 +135,7 @@ class NotaIngresoAController extends Controller
                             $DetalleNotaIngreso=new DetalleNotaIngresoA;
                             $DetalleNotaIngreso->ninga_id=$ninga_id->ninga_id;
                             $DetalleNotaIngreso->tienda_id=$request["tie_".$i];
-                            $DetalleNotaIngreso->cod_barras="código de prueba";
+                            $DetalleNotaIngreso->cod_barras="";
                             $DetalleNotaIngreso->peso_cant=$request["pes_".$i];
                             $DetalleNotaIngreso->rollo=$request["roll_".$i];
                             $DetalleNotaIngreso->impreso="1";
@@ -143,6 +143,23 @@ class NotaIngresoAController extends Controller
                             $DetalleNotaIngreso->fecha=$request["fec_".$i];
 
                             $DetalleNotaIngreso->save();
+
+/*dNotInga_id (ninga_id)    tienda_id   cod_barras  peso_cant   rollo   impreso estado  fecha
+
+                (ninga_id)    color_id    producto_id proveedor_id    partida fecha*/
+                            $codi=DetalleNotaIngresoA::select('dNotInga_id')
+                            ->orderBy('dNotInga_id','Desc')                      
+                            ->get()
+                            ->first();          
+
+                            $cb=$codi->dNotInga_id."-".$request["fec_".$i];          
+                            
+
+                            DetalleNotaIngresoA::where('dNotInga_id',"=",$codi->dNotInga_id)                              
+                                ->update(['cod_barras' => $cb]); 
+
+                            if(!isset($request["cbox_".$i]))//agregam los codigos de barra que estan sin marcar
+                                array_push($noimpresos_, $cb);
                         
                     }
                     else
@@ -154,13 +171,24 @@ class NotaIngresoAController extends Controller
                                 ->update(['tienda_id' => $request["tie_".$i],'peso_cant' => $request["pes_".$i],'rollo' => $request["roll_".$i]]);    
                             }*/
                         /**************************** FIN ACTUALIZAR ***************************/
+                        if(!isset($request["cbox_".$i]))//agregam los codigos de barra que estan sin marcar
+                            array_push($noimpresos_, $request["cb_".$i]); 
                     }
                 }
             }
 
         //});
+            if(empty($noimpresos_))            
+                return redirect()->route('notaingresoatipico.create',$request->codint)->with('info','Las notas atipico se crearon correctamente.');        
+            else
+            {
+                $cod_ndi=$request->codint;                            
+                $noimpresos=json_encode($noimpresos_,true);                
+                
+                return view("comercializacion.notaingresoatipico.impresion",compact("noimpresos","cod_ndi"));
+            }    
 
-       return redirect()->route('comercializacion.index',$request->codint)->with('info','Se creó correctamente la nota de atípico.'); 
+       //return redirect()->route('comercializacion.index',$request->codint)->with('info','Se creó correctamente la nota de atípico.'); 
     }    
 
     public function create()
@@ -188,10 +216,11 @@ class NotaIngresoAController extends Controller
             'color.id_color',
             'detalle_nota_ingreso_a.peso_cant',
             'detalle_nota_ingreso_a.rollo',
-            'detalle_nota_ingreso_a.impreso')
+            'detalle_nota_ingreso_a.impreso',
+            'detalle_nota_ingreso_a.cod_barras')
         //->where('nota_ingreso.desptint_id','=', $id)
         ->orderBy('detalle_nota_ingreso_a.dNotInga_id',"Asc")
-        ->paginate(5);
+        ->paginate(10);
 
         $id=0;
 
@@ -216,6 +245,12 @@ class NotaIngresoAController extends Controller
         return view("comercializacion.notaingresoatipico.create",compact('proveedor','tienda','color','producto','fecha','id','bandejatabla',"cad","conn"));
         //return $bandejatabla;
     }
+
+    public function impresion($id)
+    {
+        $v=1;
+        return view("comercializacion.notaingresoatipico.impresion",compact("v"));
+    }  
     
   
 }
