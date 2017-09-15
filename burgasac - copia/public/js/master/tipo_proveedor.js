@@ -1,0 +1,1 @@
+$("#table-tipo_proveedor").DataTable();

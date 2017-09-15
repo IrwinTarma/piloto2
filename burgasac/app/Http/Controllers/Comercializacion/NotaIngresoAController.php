@@ -219,8 +219,8 @@ class NotaIngresoAController extends Controller
             'detalle_nota_ingreso_a.impreso',
             'detalle_nota_ingreso_a.cod_barras')
         //->where('nota_ingreso.desptint_id','=', $id)
-        ->orderBy('detalle_nota_ingreso_a.dNotInga_id',"Asc")
-        ->paginate(10);
+        ->orderBy('detalle_nota_ingreso_a.dNotInga_id',"Asc")->get();
+        //->paginate(10);
 
         $id=0;
 

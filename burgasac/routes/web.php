@@ -129,6 +129,7 @@ Route::resource('comercializacion/comercializacion','Comercializacion\\Comercial
 route::resource("comercializacion/notaingresoatipico",'Comercializacion\\NotaIngresoAController');
 
 Route::get('comercializacion/notaingreso/create/{id}', 'Comercializacion\\NotaIngresoController@create')->name('notaingreso.create');
+Route::get('comercializacion/notaingreso/editar/{id}', 'Comercializacion\\NotaIngresoController@editar')->name('notaingreso.editar');
 Route::get('comercializacion/notaingreso/show/{id}', 'Comercializacion\\NotaIngresoController@show')->name('notaingreso.show');
 Route::post('comercializacion/notaingreso/store', 'Comercializacion\\NotaIngresoController@store')->name('notaingreso.store');
 Route::get('comercializacion/notaingreso/impresion/{id}', 'Comercializacion\\NotaIngresoController@impresion')->name('notaingreso.impresion');

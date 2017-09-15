@@ -42,7 +42,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label for="">Producto</label>
                                 <select class="form-control" name="producto" id="producto">
                                     <option value="">Todos</option>
@@ -51,7 +51,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 <label for="">Estado</label>
                                 <select class="form-control" name="estado" id="estado">
                                     <option value="0">Abierto</option>
@@ -131,21 +131,26 @@
                                         </td>
                                         <td>
                                             @if($band->estado==0)
-                                                <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">Crear / Editar</a> | 
+                                                <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-xs btn-success">
+                                                    <i class="fa fa-sticky-note" data-toggle="tooltip" data-placement="top" title="" data-original-title="Crear"></i>
+                                                </a> | 
+                                                <a href="{{ route('notaingreso.editar',$band->id) }}" class="btn btn-xs btn-primary">
+                                                    <i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"></i>
+                                                </a> | 
                                             @endif
-                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-link">Ver</a> 
+                                            <a href="{{ route('notaingreso.show',$band->id) }}" class="btn btn-xs btn-info">
+                                                <i class="fa fa-search" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i>
+                                            </a> 
                                             @if($band->estado==0)
                                             | 
-                                            <a href="javascript:cerrar('{{ $band->id }}')" class="btn btn-link">cerrar</a>
+                                            <a data-method="delete" data-trans-button-cancel="Cancel" data-trans-button-confirm="Ok" data-trans-title="¿Está de cerrar el registro?" class="btn btn-xs btn-danger" style="cursor:pointer;" onclick="$(this).find(&quot;form&quot;).submit();">
+                                                <i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="" data-original-title="Cerrar"></i>
+                                                <form action="{{ route('comercializacion.update',$band->id) }}" method="POST" name="delete_item" style="display:none">
+                                                   {{ csrf_field() }}
+                                                    <input type="hidden" name="_method" value="PUT">                                                    
+                                                </form>
+                                            </a>  
                                             @endif
-                                            <form action="{{ route('comercializacion.update',$band->id) }}" method="POST" id="postcerrar_{{ $band->id }}">
-                                                {{ csrf_field() }}
-                                                <input type="hidden" name="_method" value="PUT">
-                                                <!--button class="btn btn-link">cerrar</button-->
-                                            </form>
-                                             <!--| 
-                                            <a href="{{ route('notaingreso.create',$band->id) }}" class="btn btn-link">X</a-->
-                                            
                                         </td>                                    
                                     </tr>
                                 @endforeach

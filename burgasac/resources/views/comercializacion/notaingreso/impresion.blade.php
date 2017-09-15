@@ -23,7 +23,7 @@
 	<div class="row" style="padding: 0px 19px;margin-top: -7px;">
 		<div class="col-md-12 col-centered">			
 			<a href="#" class="btn btn-success">Imprimir</a>
-			<a href="{{ route('notaingreso.create',$cod_ndi)}}" class="btn btn-primary">Ir a Nota de Ingreso</a>			
+			<!--a href="{{ route('notaingreso.create',$cod_ndi)}}" class="btn btn-primary">Ir a Nota de Ingreso</a-->			
 			<a href="{{ route('comercializacion.index')}}" class="btn btn-warning">Ir a Bandeja</a>		
 
 		</div>

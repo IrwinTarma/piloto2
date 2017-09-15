@@ -149,7 +149,7 @@ class NotaIngresoController extends Controller
 			}
 
             if(empty($noimpresos_))            
-                return redirect()->route('notaingreso.create',$request->codint)->with('info','Las notas se crearon correctamente.');        
+                return redirect()->route('comercializacion.index',$request->codint)->with('info','Las notas se crearon correctamente.');        
             else
             {
                 $cod_ndi=$request->codint;                            
@@ -204,7 +204,7 @@ class NotaIngresoController extends Controller
                 'detalle_nota_ingreso.impreso',
                 'detalle_nota_ingreso.cod_barras')
             ->where('nota_ingreso.desptint_id','=', $id)
-            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")
+            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")//->get();
             ->paginate(10);
 
 
@@ -255,14 +255,65 @@ class NotaIngresoController extends Controller
             	'detalle_nota_ingreso.impreso',
                 'detalle_nota_ingreso.cod_barras')
             ->where('nota_ingreso.desptint_id','=', $id)
-            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")
-            ->paginate(10);
+            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")->get();
+            //->paginate(10);
 
 
         $fecha=Carbon::now()->format('Y-m-d');
     	return view("comercializacion.notaingreso.create",compact('bandeja','tienda','fecha','id','bandejatabla'));
     }
     
+    public function editar($id)
+    {
+        $tienda=Tienda::all();
+        $bandeja = DB::table('detalles_despacho_tintoreria')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
+            ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
+            ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
+            ->select('detalles_despacho_tintoreria.created_at',
+                'detalles_despacho_tintoreria.id', 
+                'proveedores.razon_social', 
+                'productos.nombre_generico',
+                'detalles_despacho_tintoreria.cantidad',
+                'detalles_despacho_tintoreria.rollos',
+                'color.nombre',
+                'detalles_despacho_tintoreria.estado',
+                'detalles_despacho_tintoreria.color_id',
+                'detalles_despacho_tintoreria.producto_id',
+                'detalles_despacho_tintoreria.proveedor_id',
+                'detalles_despacho_tintoreria.nro_lote')            
+            ->where('detalles_despacho_tintoreria.id','=', $id)
+            ->get()
+            ->first();
+
+        $bandejatabla = DB::table('detalle_nota_ingreso')
+            ->leftJoin('nota_ingreso', 'detalle_nota_ingreso.ning_id', '=', 'nota_ingreso.ning_id')
+            ->leftJoin('tienda', 'detalle_nota_ingreso.tienda_id', '=', 'tienda.tienda_id')
+            ->leftJoin('detalles_despacho_tintoreria', 'nota_ingreso.desptint_id', '=', 'detalles_despacho_tintoreria.id')
+            ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
+            ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
+
+            ->select('detalle_nota_ingreso.dNotIng_id',
+                'nota_ingreso.ning_id',
+                'detalle_nota_ingreso.fecha',
+                'productos.nombre_especifico',
+                'detalle_nota_ingreso.tienda_id',
+                'tienda.desc_tienda',
+                'nota_ingreso.partida',
+                'color.nombre',
+                'detalle_nota_ingreso.peso_cant',
+                'detalle_nota_ingreso.rollo',
+                'detalle_nota_ingreso.impreso',
+                'detalle_nota_ingreso.cod_barras')
+            ->where('nota_ingreso.desptint_id','=', $id)
+            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")->get();
+            //->paginate(10);
+
+
+        $fecha=Carbon::now()->format('Y-m-d');
+        return view("comercializacion.notaingreso.editar",compact('bandeja','tienda','fecha','id','bandejatabla'));
+    }
+
     public function impresion($id)
     {
         $v=1;

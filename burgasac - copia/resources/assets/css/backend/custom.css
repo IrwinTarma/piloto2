@@ -1,0 +1,7 @@
+table.table th{
+	background-color: #ea6357;
+	color: white;
+}
+table.table > tbody > tr > td{
+	border: 1px solid #bcbcbc;
+}
