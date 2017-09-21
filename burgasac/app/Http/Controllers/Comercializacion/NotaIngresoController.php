@@ -204,8 +204,8 @@ class NotaIngresoController extends Controller
                 'detalle_nota_ingreso.impreso',
                 'detalle_nota_ingreso.cod_barras')
             ->where('nota_ingreso.desptint_id','=', $id)
-            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")//->get();
-            ->paginate(10);
+            ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")->get();
+            //->paginate(10);
 
 
         $fecha=Carbon::now()->format('Y-m-d');
@@ -219,6 +219,7 @@ class NotaIngresoController extends Controller
             ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
             ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
+            ->leftJoin('nota_ingreso', 'nota_ingreso.desptint_id', '=', 'detalles_despacho_tintoreria.id')
             ->select('detalles_despacho_tintoreria.created_at',
                 'detalles_despacho_tintoreria.id', 
                 'proveedores.razon_social', 
@@ -230,7 +231,8 @@ class NotaIngresoController extends Controller
                 'detalles_despacho_tintoreria.color_id',
                 'detalles_despacho_tintoreria.producto_id',
                 'detalles_despacho_tintoreria.proveedor_id',
-                'detalles_despacho_tintoreria.nro_lote')            
+                'detalles_despacho_tintoreria.nro_lote',
+                'nota_ingreso.desptint_id')            
             ->where('detalles_despacho_tintoreria.id','=', $id)
             ->get()
             ->first();
@@ -270,6 +272,7 @@ class NotaIngresoController extends Controller
             ->leftJoin('color', 'detalles_despacho_tintoreria.color_id', '=', 'color.id_color')
             ->leftJoin('productos', 'detalles_despacho_tintoreria.producto_id', '=', 'productos.id')
             ->leftJoin('proveedores', 'detalles_despacho_tintoreria.proveedor_id', '=', 'proveedores.id')
+            ->leftJoin('nota_ingreso', 'nota_ingreso.desptint_id', '=', 'detalles_despacho_tintoreria.id')
             ->select('detalles_despacho_tintoreria.created_at',
                 'detalles_despacho_tintoreria.id', 
                 'proveedores.razon_social', 
@@ -281,7 +284,8 @@ class NotaIngresoController extends Controller
                 'detalles_despacho_tintoreria.color_id',
                 'detalles_despacho_tintoreria.producto_id',
                 'detalles_despacho_tintoreria.proveedor_id',
-                'detalles_despacho_tintoreria.nro_lote')            
+                'detalles_despacho_tintoreria.nro_lote',
+                'nota_ingreso.desptint_id')            
             ->where('detalles_despacho_tintoreria.id','=', $id)
             ->get()
             ->first();
@@ -309,13 +313,22 @@ class NotaIngresoController extends Controller
             ->orderBy('detalle_nota_ingreso.dNotIng_id',"Asc")->get();
             //->paginate(10);
 
+        $partidas=NotaIngreso::select("partida")->where("desptint_id","=",$id)->get();
+
 
         $fecha=Carbon::now()->format('Y-m-d');
-        return view("comercializacion.notaingreso.editar",compact('bandeja','tienda','fecha','id','bandejatabla'));
+        return view("comercializacion.notaingreso.editar",compact('bandeja','tienda','fecha','id','bandejatabla','partidas'));
+    }
+
+    public function veri_partida($id,$par)
+    {
+        $rpt=NotaIngreso::select("ning_id")->where("desptint_id","=",$id)->where("partida","=",$par)->get();
+        return $rpt;
     }
 
     public function impresion($id)
     {
+
         $v=1;
         return view("comercializacion.notaingreso.impresion",compact("v"));
     }  

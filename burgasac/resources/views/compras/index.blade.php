@@ -116,7 +116,7 @@
 @endsection
 
 @section('after-scripts')
-    {{ Html::script('plugins/listjs/list.min.js') }}
+ 
     <script>
         var options = {
             valueNames: [ 'updated_at', 'codigo', 'proveedor', 'tipo_comprobante', 'nro_guia', 'peso', 'estado' ]
@@ -136,5 +136,5 @@
     </script>
 @stop
 @push('scripts')
-{{ Html::script('js/procesos/compra.js') }}
+
 @endpush

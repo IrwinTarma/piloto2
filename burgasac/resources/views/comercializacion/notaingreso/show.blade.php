@@ -22,9 +22,9 @@
                 <!--form action="{{ route('notaingreso.store') }}" method="POST">
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="POST">
-                    <input type="hidden" name="codint" id="codint" value="{{ $id }}">
+                    <input type="hidden" name="codint" id="codint" value="{{ $id }}"-->
                     <input type="hidden" name="conta" id="conta" value="">
-                    <input type="hidden" name="eliminados" id="eliminados" value=""-->
+                    <!--input type="hidden" name="eliminados" id="eliminados" value=""-->
 
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -147,7 +147,9 @@
                                             
                                         </tbody>
                                     </table>
-                                    {!! $bandejatabla->render() !!}
+                                    <ul class="pagination">
+                                      
+                                    </ul>
                                 </div>
                             </div>
 
@@ -173,7 +175,10 @@
 
 @push('scripts')
 <script type="text/javascript">
-var indice_tabla=0;
+    var indice_tabla=0;
+    var cant_items_real=0;
+    var indice_act=1;
+    var ultima_pag=1;
     $(document).ready(function(){
         /**
          * Funcion para añadir una nueva columna en la tabla
@@ -217,19 +222,25 @@ var indice_tabla=0;
                 $("#bandeja-produccion tr:last").remove();
             }
         });*/
-
+        var cont_item_bd=0;
         @foreach($bandejatabla as $tab_bandeja) 
             addtabla("{{ $tab_bandeja->dNotIng_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}");
+            cont_item_bd++;
         @endforeach
 
+        cant_items_real=cont_item_bd;
         
+        /*** cargar lista de p/ginas***/
+        controlpaginacion(10,cant_items_real);        
+        /*** cargar paginación inicial ***/
+        paginacion(1,10);
     });
         function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll,imp)
         {
             indice_tabla++;
             $("#conta").val(indice_tabla);
             var nuevaFila="<tr id=fila_"+indice_tabla+">";
-            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="'+cod+'">'+cod+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="'+cod+'">'+indice_tabla+"</td>";
             
             nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+fec+'">'+fec+"</td>";
             nuevaFila+="<td>"+prod+"</td>";
@@ -249,11 +260,73 @@ var indice_tabla=0;
             return 1;            
         }
 
-        function delTabla(id)
-        {            
-            datos= $("#eliminados").val()+","+$("#cod_ndi_"+id).val();
-            $("#eliminados").val(datos);
-            $("#fila_"+id).remove();
+        function controlpaginacion(pag,total)
+        {
+            var cad='';
+            var act=true;
+            var i;
+            for(i=1;i<=total/pag;i++)
+            {
+
+                if(act)
+                    cad='<li onclick="paginacion('+i+','+pag+')" style="cursor: pointer;"><span>«</span></li>';
+
+                cad+='<li '+((act)?'class="active"':'')+' onclick="paginacion('+i+','+pag+');" id="pgitem_'+i+'" style="cursor: pointer;"><span>'+i+'</span></li>';
+                act=false;
+            }
+            if(total%pag>0)
+            {
+                cad+='<li onclick="paginacion('+i+','+pag+');" id="pgitem_'+i+'" style="cursor: pointer;"><span>'+i+'</span></li>';
+                cad+='<li onclick="paginacion('+(i)+','+pag+');" style="cursor: pointer;"><span>»</span></li>';
+            }
+            else
+                cad+='<li onclick="paginacion('+(--i)+','+pag+')" style="cursor: pointer;"><span>»</span></li>';
+
+            ultima_pag=i;
+
+            $(".pagination").empty();
+            $(".pagination").html(cad);
         }
+
+        function paginacion(pag,de)
+        {   
+            /** ocultar registros de 10 en 10 **/         
+
+            var fin=pag*de;;
+            var ini=(pag-1)*de;
+
+
+            //meter todo en un array, con indice ordenado                        
+            var array_items=[];
+            var contador=0;
+            for (var i = 1; i <= parseInt($("#conta").val()); i++) 
+            {                
+                var nomfila="fila_"+i;
+                if ( $("#"+nomfila).length > 0 ) 
+                {
+                    array_items[contador]=nomfila;
+                    contador++;
+                }                
+            }
+            //recorrer segun los limites mostrar lo necesario
+
+            for(var i=0;i<contador;i++)
+            {
+                if(i>=ini && i<fin)
+                    $("#"+array_items[i]).show();        
+                else
+                    $("#"+array_items[i]).hide();
+            }
+
+            indice_act=pag;//guarada el indice de pág
+
+            for(i=1;i<=ultima_pag;i++)
+                $("#pgitem_"+i).removeAttr('class');
+
+            $("#pgitem_"+indice_act).attr('class','active');
+
+            return 1;
+        }
+
     </script>
 @endpush('scripts')

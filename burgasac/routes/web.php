@@ -134,6 +134,8 @@ Route::get('comercializacion/notaingreso/show/{id}', 'Comercializacion\\NotaIngr
 Route::post('comercializacion/notaingreso/store', 'Comercializacion\\NotaIngresoController@store')->name('notaingreso.store');
 Route::get('comercializacion/notaingreso/impresion/{id}', 'Comercializacion\\NotaIngresoController@impresion')->name('notaingreso.impresion');
 Route::get('comercializacion/notaingresoatipico/impresion/{id}', 'Comercializacion\\NotaIngresoAController@impresion')->name('notaingresoatipico.impresion');
+
+Route::get('comercializacion/notaingreso/veri_partida/{id}/{par}', 'Comercializacion\\NotaIngresoController@veri_partida')->name('notaingreso.veri_partida');
 //Route::get('abono/abonos/create/{compra_id}', 'Abono\\AbonosController@create')->name('abono.compras.create');
 
 //Route::post('comercializacion/notaingreso', 'Comercializacion\\NotaIngresoController@store');

@@ -71,7 +71,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="">Tienda</label>                            
-                                    <select class="form-control" name="tienda" id="tienda">                                                                              
+                                    <select class="form-control" name="tienda" id="tienda" autofocus="autofocus" tabindex="1">                                                                              
                                         @foreach ($tienda as $key => $tiendalocal)
                                             <option value="{{$tiendalocal->tienda_id}}">{{$tiendalocal->desc_tienda}}</option>
                                         @endforeach
@@ -80,19 +80,26 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="">Partida</label>
-                                    <input id="partida" type="text" class="form-control" name="partida" placeholder="# partida" maxlength="15" onkeypress="return tabular(event,this)" autofocus="autofocus" tabindex="1">
+                                    <!--input id="partida" type="text" class="form-control" name="partida" placeholder="# partida" maxlength="15" tabindex="2"-->
+                                    <select class="form-control" name="partida" id="partida" autofocus="autofocus" tabindex="2">                                                                              
+                                        @foreach ($partidas as $par)
+                                            <option value="{{$par->partida}}">{{$par->partida}}</option>
+                                        @endforeach
+                                        
+                                    </select>
                                 </div>
                                 <div class="col-md-2">
                                     <label for="">Peso</label>
-                                    <input id="peso" type="text" class="form-control" name="peso" placeholder="peso o cantidad" maxlength="6" onkeypress="return tabular(event,this)" tabindex="2">
+                                    <input id="peso" type="text" class="form-control" name="peso" placeholder="peso o cantidad" maxlength="6" tabindex="3">
                                 </div>
 
                                 <div class="col-md-2">
                                     <label for="">Rollos</label>
-                                    <input id="rollo" type="text" class="form-control" name="rollo" placeholder="rollos" maxlength="9" tabindex="3" value="1">
+                                    <input id="rollo" type="text" class="form-control" name="rollo" placeholder="rollos" maxlength="9" tabindex="4" value="1">
                                 </div>
                                 <div class="col-md-2" style="text-align:center;">
                                     <br>                                    
+                                    <div  id="add" class="btn btn-primary" tabindex="4">agregar</div>
                                     <div  id="act" class="btn btn-primary" style="display:none;" onclick="actualiza()">actualizar</div>
                                 </div>
                             </div>
@@ -105,10 +112,11 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <br>
+                                    <div id="capa" style="position: absolute;width: 97%;height: 92%;background-color: rgba(19, 19, 19, 0.35);display: none;top: 1px;"></div>
                                     <table id="bandeja-produccion" name="bandeja-produccion" class="table table-striped table-bordered table-hover">
                                         <thead>
                                             <th>
-                                                Item
+                                                Id
                                             </th>
                                             <th>
                                                 Fecha
@@ -144,7 +152,9 @@
                                             
                                         </tbody>
                                     </table>
-                        
+                                    <ul class="pagination">
+                                      
+                                    </ul>
                                 </div>
                             </div>
 
@@ -166,12 +176,16 @@
         </div>
     </div>
 
+
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
 var indice_tabla=0;
 var key_enter=true;
+var cant_items_real=0;
+var indice_act=1;
+var ultima_pag=1;
     $(document).ready(function(){
         
         $('#rollo').keyup(function (){
@@ -179,11 +193,11 @@ var key_enter=true;
         });
         $('#peso').numeric(",").numeric({decimalPlaces: 2});
 
-        $("#tienda").attr('disabled','disabled');
+       /* $("#tienda").attr('disabled','disabled');
         $("#partida").attr('disabled','disabled');
         $("#peso").attr('disabled','disabled');
         $("#rollo").attr('disabled','disabled');
-
+        */
         
         $("#add").click(function(){
         if(validacion()==0)
@@ -194,7 +208,7 @@ var key_enter=true;
             indice_tabla++;
             $("#conta").val(indice_tabla);
             var nuevaFila="<tr id=fila_"+indice_tabla+">";
-            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+'<i class="fa fa-hand-o-right" aria-hidden="true"></i>'+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+'<i class="fa fa-hand-o-right" aria-hidden="true"></i> '+indice_tabla+"</td>";
             
             nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+$("#fecha_t").val()+'">'+$("#fecha_t").val()+"</td>";
             nuevaFila+="<td>"+$("#producto_t").val()+"</td>";
@@ -208,7 +222,7 @@ var key_enter=true;
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
+            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
             nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >'+'<a class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
@@ -217,14 +231,33 @@ var key_enter=true;
             $("#rollo").val("1");
             $( "#peso" ).focus();
 
-            $("#partida").attr('disabled','disabled');
+            //$("#partida").attr('disabled','disabled');
+
+            /*** paginación ***/        
+            cant_items_real++;
+            //var ult_pag=Math.floor(cant_items_real/10);
+            /*** cargar lista de p/ginas***/
+            controlpaginacion(10,cant_items_real);        
+            /*** cargar paginación inicial ***/
+            //paginacion(((cant_items_real%10 > 0)?++ult_pag:ult_pag),10);
+            paginacion(ultima_pag,10);
+            //$("#partida").attr('disabled','disabled');
         }   
 
         });
         
+        var cont_item_bd=0;
         @foreach($bandejatabla as $tab_bandeja) 
             addtabla("{{ $tab_bandeja->dNotIng_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}","{{ $tab_bandeja->cod_barras }}");
+            cont_item_bd++;
         @endforeach
+
+        cant_items_real=cont_item_bd;
+        
+        /*** cargar lista de p/ginas***/
+        controlpaginacion(10,cant_items_real);        
+        /*** cargar paginación inicial ***/
+        paginacion(1,10);
 
     });
 
@@ -242,6 +275,36 @@ var key_enter=true;
             $('#add').click();
         };
     });            
+
+    $("#tienda").bind('keydown',function(e){
+        if ( e.which == 13 ) 
+        {
+            $("#partida").focus();
+        };
+    });
+
+
+    $("#partida").bind('keydown',function(e){
+        if ( e.which == 13 ) 
+        {
+            $("#peso").focus();
+        };
+    });
+
+    $("#peso").bind('keydown',function(e){
+        if ( e.which == 13 ) 
+        {
+            $("#rollo").focus();
+        };
+    });
+
+
+    $("#rollo").bind('keydown',function(e){
+        if ( e.which == 13 && key_enter ) 
+        {
+            $('#add').click();
+        };
+    });
     
 
         function addtabla(cod,fec,prod,tiecod,tie,par,col,pes,roll,imp,cb)
@@ -249,7 +312,7 @@ var key_enter=true;
             indice_tabla++;
             $("#conta").val(indice_tabla);
             var nuevaFila="<tr id=fila_"+indice_tabla+">";
-            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="'+cod+'">'+cod+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="'+cod+'">'+indice_tabla+"</td>";
             
             nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+fec+'">'+fec+"</td>";
             nuevaFila+="<td>"+prod+"</td>";
@@ -263,7 +326,7 @@ var key_enter=true;
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" id="cdel_'+indice_tabla+'"  onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
+            nuevaFila+='<td><div class="btn btn-link" id="cdel_'+indice_tabla+'"  onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
             nuevaFila+='<td><div class="btn btn-link" id="cedi_'+indice_tabla+'" onclick="editar('+indice_tabla+')" >'+'<a class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
@@ -279,6 +342,11 @@ var key_enter=true;
                 var datos= $("#eliminados").val()+","+$("#cod_ndi_"+id).val();
                 $("#eliminados").val(datos);
                 $("#fila_"+id).remove();
+                cant_items_real--;
+                /*** cargar lista de p/ginas***/
+                controlpaginacion(10,cant_items_real);        
+                /*** cargar paginación inicial ***/
+                paginacion(indice_act,10);
             }            
         }
 
@@ -286,14 +354,15 @@ var key_enter=true;
         {
 
             $("#tienda").removeAttr("disabled");
-            $("#partida").attr('disabled','disabled');
+            //$("#partida").attr('disabled','disabled');
             $("#peso").removeAttr("disabled");
             $("#rollo").removeAttr("disabled");
 
             $("#dina_control").css( "box-shadow","rgba(0, 0, 0, 0.75) 0px 4px 47px -5px"); 
 
             $("#tienda").val($("#tie_"+id).val());
-            $("#partida").val($("#par_"+id).val());
+            $('#partida > option[value="'+$("#par_"+id).val()+'"]').attr('selected', 'selected');
+            //$("#partida").val($("#par_"+id).val());
             $("#peso").val($("#pes_"+id).val());
             $("#rollo").val($("#roll_"+id).val());
 
@@ -307,6 +376,7 @@ var key_enter=true;
             $("#add").hide();   
 
             $( "#peso" ).focus();
+            $("#capa").show();
             key_enter=false;
         }
 
@@ -332,7 +402,7 @@ var key_enter=true;
                 $("#dina_control").css( "box-shadow","none"); 
 
                 $("#tienda").val("1");
-                $("#partida").val("");
+                //$("#partida").val("");
                 $("#peso").val("");
                 $("#rollo").val("");
 
@@ -347,26 +417,27 @@ var key_enter=true;
                 }
 
                 $( "#partida" ).focus();
+                $("#capa").hide();
                 key_enter=true;
                 //si hay agregar al input .... el código
-                $("#tienda").attr('disabled','disabled');
+                /*$("#tienda").attr('disabled','disabled');
                 $("#partida").attr('disabled','disabled');
                 $("#peso").attr('disabled','disabled');
-                $("#rollo").attr('disabled','disabled');
+                $("#rollo").attr('disabled','disabled');*/
             }
 
         }
         function cancelar()
         {
             var id=$("#actualizar").val();
-            $("#partida").removeAttr('disabled');
+            //$("#partida").removeAttr('disabled');
             $("#cdel_"+id).show();
             $("#cedi_"+id).show();
 
             $("#dina_control").css( "box-shadow","none"); 
 
             $("#tienda").val("1");
-            $("#partida").val("");
+            //$("#partida").val("");
             $("#peso").val("");
             $("#rollo").val("");
 
@@ -374,11 +445,12 @@ var key_enter=true;
             $("#add").show();
 
             $( "#partida" ).focus();
+            $("#capa").hide();
             key_enter=true;
-            $("#tienda").attr('disabled','disabled');
+            /*$("#tienda").attr('disabled','disabled');
             $("#partida").attr('disabled','disabled');
             $("#peso").attr('disabled','disabled');
-            $("#rollo").attr('disabled','disabled');
+            $("#rollo").attr('disabled','disabled');*/
         }
 
          function anular(e) {
@@ -419,22 +491,73 @@ var key_enter=true;
             return (key_error)?1:0;
          }
 
+         function controlpaginacion(pag,total)
+        {
+            var cad='';
+            var act=true;
+            var i;
+            for(i=1;i<=total/pag;i++)
+            {
 
-    </script>
-    <script>
-       function tabular(e,obj) {
-         tecla=(document.all) ? e.keyCode : e.which;
-         if(tecla!=13) return;
-         frm=obj.form;
-         for(i=0;i<frm.elements.length;i++)
-           if(frm.elements[i]==obj) {
-             if (i==frm.elements.length-1) i=-1;
-             break }
-         frm.elements[i+1].focus();
-         return false;
-       }
+                if(act)
+                    cad='<li onclick="paginacion('+i+','+pag+')" style="cursor: pointer;"><span>«</span></li>';
 
-       if(!("autofocus" in document.createElement("input")))
-           document.getElementById("uno").focus();
-   </script>
+                cad+='<li '+((act)?'class="active"':'')+' onclick="paginacion('+i+','+pag+');" id="pgitem_'+i+'" style="cursor: pointer;"><span>'+i+'</span></li>';
+                act=false;
+            }
+            if(total%pag>0)
+            {
+                cad+='<li onclick="paginacion('+i+','+pag+');" id="pgitem_'+i+'" style="cursor: pointer;"><span>'+i+'</span></li>';
+                cad+='<li onclick="paginacion('+(i)+','+pag+');" style="cursor: pointer;"><span>»</span></li>';
+            }
+            else
+                cad+='<li onclick="paginacion('+(--i)+','+pag+')" style="cursor: pointer;"><span>»</span></li>';
+
+            ultima_pag=i;
+
+            $(".pagination").empty();
+            $(".pagination").html(cad);
+        }
+
+        function paginacion(pag,de)
+        {   
+            /** ocultar registros de 10 en 10 **/         
+
+            var fin=pag*de;;
+            var ini=(pag-1)*de;
+
+
+            //meter todo en un array, con indice ordenado                        
+            var array_items=[];
+            var contador=0;
+            for (var i = 1; i <= parseInt($("#conta").val()); i++) 
+            {                
+                var nomfila="fila_"+i;
+                if ( $("#"+nomfila).length > 0 ) 
+                {
+                    array_items[contador]=nomfila;
+                    contador++;
+                }                
+            }
+            //recorrer segun los limites mostrar lo necesario
+
+            for(var i=0;i<contador;i++)
+            {
+                if(i>=ini && i<fin)
+                    $("#"+array_items[i]).show();        
+                else
+                    $("#"+array_items[i]).hide();
+            }
+
+            indice_act=pag;//guarada el indice de pág
+
+            for(i=1;i<=ultima_pag;i++)
+                $("#pgitem_"+i).removeAttr('class');
+
+            $("#pgitem_"+indice_act).attr('class','active');
+
+            return 1;
+        }
+
+    </script>    
 @endpush('scripts')

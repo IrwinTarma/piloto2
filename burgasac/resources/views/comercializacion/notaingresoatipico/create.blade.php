@@ -134,17 +134,9 @@
                                         </tbody>
                                     </table>
                                    
-                                    <!--ul class="pagination">
-                                        
-                                        <li class="disabled"><span>«</span></li>
-
-                                        <li class="active"><span>1</span></li>
-                                        <li><a href="http://127.0.0.1:8001/comercializacion/notaingreso/show/1?page=2">2</a></li>
-                                        
-                                        <li><a href="http://127.0.0.1:8001/comercializacion/notaingreso/show/1?page=2" rel="next">»</a></li>
-                                    </ul-->
-
-
+                                    <ul class="pagination">
+                                      
+                                    </ul>
                                 </div>
                             </div>
 
@@ -168,6 +160,9 @@
 @push('scripts')
 <script type="text/javascript">
 var indice_tabla=0;
+var cant_items_real=0;
+var indice_act=1;
+var ultima_pag=1;
     $(document).ready(function(){
 
         $('#rollos_t').keyup(function (){
@@ -177,9 +172,18 @@ var indice_tabla=0;
         
         $( "#color" ).focus();
         
+         var cont_item_bd=0;
         @foreach($bandejatabla as $tab_bandeja) 
             addtabla("{{ $tab_bandeja->dNotInga_id }}","{{ $tab_bandeja->fecha }}","{{ $tab_bandeja->id }}","{{ $tab_bandeja->nombre_especifico }}","{{ $tab_bandeja->tienda_id }}","{{ $tab_bandeja->desc_tienda }}","{{ $tab_bandeja->partida }}","{{ $tab_bandeja->id_color }}","{{ $tab_bandeja->nombre }}","{{ $tab_bandeja->peso_cant }}","{{ $tab_bandeja->rollo }}","{{ $tab_bandeja->impreso }}","{{ $tab_bandeja->cod_barras }}");
+            cont_item_bd++;
         @endforeach
+
+        cant_items_real=cont_item_bd;
+        
+        /*** cargar lista de p/ginas***/
+        controlpaginacion(10,cant_items_real);        
+        /*** cargar paginación inicial ***/
+        paginacion(1,10);
 
     });
 
@@ -218,7 +222,7 @@ var indice_tabla=0;
             indice_tabla++;
             $("#conta").val(indice_tabla);
             var nuevaFila="<tr id=fila_"+indice_tabla+">";
-            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+indice_tabla+"</td>";
+            nuevaFila+="<td>"+'<input type="hidden" name="cod_ndi_'+indice_tabla+'" id="cod_ndi_'+indice_tabla+'" value="0">'+'<i class="fa fa-hand-o-right" aria-hidden="true"></i> '+indice_tabla+"</td>";
             
             nuevaFila+="<td>"+'<input type="hidden" name="fec_'+indice_tabla+'" id="fec_'+indice_tabla+'" value="'+$("#fecha_t").val()+'">'+$("#fecha_t").val()+"</td>";
             nuevaFila+="<td>"+'<input type="hidden" name="pro_'+indice_tabla+'" id="pro_'+indice_tabla+'" value="'+$("#producto").val()+'"><p id="Lpro_'+indice_tabla+'">'+$("#producto option:selected").html()+"</p></td>";
@@ -233,7 +237,7 @@ var indice_tabla=0;
             // Añadimos una columna con el numero total de columnas.
             // Añadimos uno al total, ya que cuando cargamos los valores para la
             // columna, todavia no esta añadida
-            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
+            nuevaFila+='<td><div class="btn btn-link" onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
             //nuevaFila+='<td><div class="btn btn-link" onclick="editar('+indice_tabla+')" >E</div>';
             nuevaFila+="</tr>";
             $("#bandeja-produccion").append(nuevaFila);
@@ -252,6 +256,16 @@ var indice_tabla=0;
             $("#peso_t").focus();
             $("#peso_t").val("");
             $( "#rollos_t" ).val("1");
+
+            /*** paginación ***/        
+            cant_items_real++;
+            //var ult_pag=Math.floor(cant_items_real/10);
+            /*** cargar lista de p/ginas***/
+            controlpaginacion(10,cant_items_real);        
+            /*** cargar paginación inicial ***/
+            //paginacion(((cant_items_real%10 > 0)?++ult_pag:ult_pag),10);
+            paginacion(ultima_pag,10);
+            //$("#partida").attr('disabled','disabled');
         }               
     }       
     
@@ -275,7 +289,7 @@ var indice_tabla=0;
         // Añadimos una columna con el numero total de columnas.
         // Añadimos uno al total, ya que cuando cargamos los valores para la
         // columna, todavia no esta añadida
-        nuevaFila+='<td><div class="btn btn-link" id="cdel_'+indice_tabla+'"  onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
+        nuevaFila+='<td><div class="btn btn-link" id="cdel_'+indice_tabla+'"  onclick="delTabla('+indice_tabla+')" >'+'<a class="btn btn-xs btn-danger"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="" data-original-title="Ver"></i></a>'+'</div>';
         //nuevaFila+='<td><div class="btn btn-link" id="cedi_'+indice_tabla+'" onclick="editar('+indice_tabla+')" >E</div>';
         nuevaFila+="</tr>";
         $("#bandeja-produccion").append(nuevaFila);
@@ -299,6 +313,12 @@ var indice_tabla=0;
             }
 
             $("#fila_"+id).remove();
+
+            cant_items_real--;
+            /*** cargar lista de p/ginas***/
+            controlpaginacion(10,cant_items_real);        
+            /*** cargar paginación inicial ***/
+            paginacion(indice_act,10);
         }            
     }
 
@@ -414,22 +434,73 @@ var indice_tabla=0;
         return (key_error)?1:0;
      }
 
+     function controlpaginacion(pag,total)
+        {
+            var cad='';
+            var act=true;
+            var i;
+            for(i=1;i<=total/pag;i++)
+            {
+
+                if(act)
+                    cad='<li onclick="paginacion('+i+','+pag+')" style="cursor: pointer;"><span>«</span></li>';
+
+                cad+='<li '+((act)?'class="active"':'')+' onclick="paginacion('+i+','+pag+');" id="pgitem_'+i+'" style="cursor: pointer;"><span>'+i+'</span></li>';
+                act=false;
+            }
+            if(total%pag>0)
+            {
+                cad+='<li onclick="paginacion('+i+','+pag+');" id="pgitem_'+i+'" style="cursor: pointer;"><span>'+i+'</span></li>';
+                cad+='<li onclick="paginacion('+(i)+','+pag+');" style="cursor: pointer;"><span>»</span></li>';
+            }
+            else
+                cad+='<li onclick="paginacion('+(--i)+','+pag+')" style="cursor: pointer;"><span>»</span></li>';
+
+            ultima_pag=i;
+
+            $(".pagination").empty();
+            $(".pagination").html(cad);
+        }
+
+        function paginacion(pag,de)
+        {   
+            /** ocultar registros de 10 en 10 **/         
+
+            var fin=pag*de;;
+            var ini=(pag-1)*de;
+
+
+            //meter todo en un array, con indice ordenado                        
+            var array_items=[];
+            var contador=0;
+            for (var i = 1; i <= parseInt($("#conta").val()); i++) 
+            {                
+                var nomfila="fila_"+i;
+                if ( $("#"+nomfila).length > 0 ) 
+                {
+                    array_items[contador]=nomfila;
+                    contador++;
+                }                
+            }
+            //recorrer segun los limites mostrar lo necesario
+
+            for(var i=0;i<contador;i++)
+            {
+                if(i>=ini && i<fin)
+                    $("#"+array_items[i]).show();        
+                else
+                    $("#"+array_items[i]).hide();
+            }
+
+            indice_act=pag;//guarada el indice de pág
+
+            for(i=1;i<=ultima_pag;i++)
+                $("#pgitem_"+i).removeAttr('class');
+
+            $("#pgitem_"+indice_act).attr('class','active');
+
+            return 1;
+        }
 
     </script>
-    <!--script>
-       function tabular(e,obj) {
-         tecla=(document.all) ? e.keyCode : e.which;
-         if(tecla!=13) return;
-         frm=obj.form;
-         for(i=0;i<frm.elements.length;i++)
-           if(frm.elements[i]==obj) {
-             if (i==frm.elements.length-1) i=-1;
-             break }
-         frm.elements[i+1].focus();
-         return false;
-       }
-
-       if(!("autofocus" in document.createElement("input")))
-           document.getElementById("uno").focus();
-   </script-->
 @endpush('scripts')
